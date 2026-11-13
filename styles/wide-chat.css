@@ -17,7 +17,7 @@ body.omnigem-wide-chat-active {
   --chat-container-width: 100% !important;
 }
 
-/* 1. Outer layout wrappers: 100% flush width, zero compounding margins/paddings */
+/* 1. Outer layout wrappers: 100% flush width for chat containers (EXCLUDING top headers) */
 body.omnigem-wide-chat-active main,
 body.omnigem-wide-chat-active chat-app,
 body.omnigem-wide-chat-active chat-window,
@@ -32,8 +32,6 @@ body.omnigem-wide-chat-active .content-wrapper,
 body.omnigem-wide-chat-active infinite-scroller > div,
 body.omnigem-wide-chat-active conversation-container > div,
 body.omnigem-wide-chat-active .conversation-container > div,
-body.omnigem-wide-chat-active chat-window > div,
-body.omnigem-wide-chat-active main > div,
 body.omnigem-wide-chat-active .chat-history > div {
   max-width: 100% !important;
   width: 100% !important;
@@ -43,6 +41,38 @@ body.omnigem-wide-chat-active .chat-history > div {
   padding-right: 0 !important;
   box-sizing: border-box !important;
   transition: max-width 0.2s ease, width 0.2s ease;
+}
+
+/* 1b. Header isolation: Guarantee Gemini's top header and the 3-dots (⋮) menu button are ALWAYS on top and clickable */
+header,
+top-nav,
+[role="banner"],
+.top-container,
+[class*="top-bar"],
+[class*="header-container"],
+.trailing-actions,
+.top-nav-actions {
+  max-width: none !important;
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+}
+
+header button,
+top-nav button,
+[role="banner"] button,
+.trailing-actions button,
+.top-nav-actions button,
+button[aria-label*="More"],
+button[aria-label*="Thêm"],
+button[aria-label*="tùy chọn"],
+button[aria-label*="Options"],
+[data-test-id="more-menu-button"],
+mat-icon-button {
+  position: relative !important;
+  z-index: 10001 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 /* 2. Message turns: Expand across the whole area with clean 24px edge spacing */
@@ -165,12 +195,13 @@ body.omnigem-wide-chat-active table {
   align-items: center;
   justify-content: center;
   position: relative;
-  margin: 0 4px;
+  margin: 0 10px 0 4px;
   user-select: none;
   cursor: pointer;
   border: 1px solid rgba(128, 128, 128, 0.2);
   transition: all 0.15s ease;
-  z-index: 999;
+  z-index: 10000;
+  pointer-events: auto;
 }
 
 #omnigem-wide-toggle-btn:hover {
@@ -200,6 +231,7 @@ body.omnigem-wide-chat-active table {
 #omnigem-wide-toggle-btn.omnigem-floating-anchor {
   position: fixed;
   top: 12px;
-  right: 56px;
+  right: 64px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
 }

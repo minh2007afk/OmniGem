@@ -76,8 +76,18 @@
       if (sampleResponse) {
         let el = sampleResponse.parentElement;
         while (el && el !== document.body && el !== document.documentElement) {
-          // Do not touch sidebars
-          if (el.tagName.toLowerCase().includes('side') || el.classList.contains('side-nav')) {
+          // Do not touch sidebars or top headers
+          const tag = el.tagName.toLowerCase();
+          if (
+            tag.includes('side') ||
+            el.classList.contains('side-nav') ||
+            tag === 'header' ||
+            tag === 'top-nav' ||
+            el.getAttribute('role') === 'banner' ||
+            el.classList.contains('top-container') ||
+            el.classList.contains('trailing-actions') ||
+            el.classList.contains('top-nav-actions')
+          ) {
             break;
           }
 
@@ -232,7 +242,7 @@
 
       // Target top-right menu container or 3-dots button (⋮)
       const moreBtn = document.querySelector(
-        'button[aria-label*="More"], button[aria-label*="Thêm"], button[aria-label*="tùy chọn"], button[aria-label*="Options"], [data-test-id="more-menu-button"]'
+        'button[aria-label*="More"], button[aria-label*="Thêm"], button[aria-label*="tùy chọn"], button[aria-label*="Options"], [data-test-id="more-menu-button"], button[aria-haspopup="menu"]'
       );
 
       const headerContainer = document.querySelector(
@@ -240,6 +250,17 @@
       );
 
       if (moreBtn && moreBtn.parentElement) {
+        // Guarantee 3-dots button stays elevated, fully clickable, and never covered
+        moreBtn.style.setProperty('position', 'relative', 'important');
+        moreBtn.style.setProperty('z-index', '10001', 'important');
+        moreBtn.style.setProperty('pointer-events', 'auto', 'important');
+        moreBtn.style.setProperty('cursor', 'pointer', 'important');
+
+        moreBtn.parentElement.style.setProperty('position', 'relative', 'important');
+        moreBtn.parentElement.style.setProperty('z-index', '10000', 'important');
+        moreBtn.parentElement.style.setProperty('pointer-events', 'auto', 'important');
+        moreBtn.parentElement.style.setProperty('overflow', 'visible', 'important');
+
         moreBtn.parentElement.insertBefore(btn, moreBtn);
       } else if (headerContainer) {
         headerContainer.appendChild(btn);
