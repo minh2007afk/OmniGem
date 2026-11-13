@@ -132,10 +132,18 @@
       } catch (err) {
         console.error('[OmniGem Optimize] Error:', err);
 
-        // Show modal for ANY error so user can fix API key
         this._state = 'idle';
         this._setLoadingUI(false);
-        this._promptForApiKey('Lỗi: ' + (err.message || 'Unknown error').slice(0, 120));
+
+        var msg = (err.message || '').toLowerCase();
+        // Only show API key modal if it's an authentication error
+        if (msg.includes('401') || msg.includes('unauthenticated') || msg.includes('api key not valid')) {
+          this._promptForApiKey('API key không hợp lệ hoặc đã hết hạn.');
+        } else {
+          // For 503 high demand or network errors, do NOT ask for API key!
+          this._flashButton('rgba(242,139,130,0.9)');
+          this._showToast('Máy chủ Google đang quá tải (503). Hãy bấm thử lại sau vài giây!');
+        }
       }
     },
 
@@ -147,8 +155,8 @@
         'Respond in the same language as the original prompt.\n\n' +
         'Original prompt:\n' + originalPrompt;
 
-      // Models to try: primary model, then flash-latest fallback
-      var models = ['gemini-3.8-flash', 'gemini-flash-latest'];
+      // Try high-throughput Flash-Lite first (rarely hits 503), then 3.8-Flash, then flash-latest
+      var models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
       var lastErr = null;
 
       for (var m = 0; m < models.length; m++) {
@@ -354,6 +362,25 @@
       var orig = btn.style.borderColor;
       btn.style.borderColor = color;
       setTimeout(function() { btn.style.borderColor = orig; }, 800);
+    },
+
+    _showToast: function(msg) {
+      var existing = document.getElementById('omnigem-opt-toast');
+      if (existing) existing.remove();
+      var toast = document.createElement('div');
+      toast.id = 'omnigem-opt-toast';
+      toast.setAttribute('style',
+        'position:fixed !important;bottom:84px !important;left:50% !important;transform:translateX(-50%) !important;' +
+        'background:#2d3039 !important;color:#f28b82 !important;border:1px solid rgba(242,139,130,0.4) !important;' +
+        'border-radius:8px !important;padding:8px 16px !important;font-size:13px !important;' +
+        'z-index:2147483647 !important;box-shadow:0 4px 16px rgba(0,0,0,0.4) !important;' +
+        'pointer-events:none !important;transition:opacity 0.3s ease !important;');
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3500);
     },
 
     _updateWordCount: function(text) {
