@@ -132,20 +132,10 @@
       } catch (err) {
         console.error('[OmniGem Optimize] Error:', err);
 
-        var msg = (err.message || '').toLowerCase();
-        if (msg.includes('api_key') || msg.includes('401') || msg.includes('403') || msg.includes('invalid')) {
-          // Key invalid → show prompt to enter new one
-          this._state = 'idle';
-          this._setLoadingUI(false);
-          this._promptForApiKey('API key không hợp lệ: ' + err.message);
-        } else {
-          this._state = 'idle';
-          this._setLoadingUI(false);
-          this._flashButton('rgba(242,139,130,0.8)');
-          // Show error as tooltip on button
-          var btn = document.getElementById('omnigem-optimize-btn');
-          if (btn) btn.title = 'Lỗi: ' + (err.message || 'Unknown error');
-        }
+        // Show modal for ANY error so user can fix API key
+        this._state = 'idle';
+        this._setLoadingUI(false);
+        this._promptForApiKey('Lỗi: ' + (err.message || 'Unknown error').slice(0, 120));
       }
     },
 
@@ -161,7 +151,10 @@
 
       var res = await fetch(API_URL + '?key=' + apiKey, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: metaPrompt }] }],
           generationConfig: {
@@ -225,9 +218,9 @@
       var desc = document.createElement('p');
       desc.setAttribute('style', 'font-size:13px !important;color:rgba(255,255,255,0.6) !important;line-height:1.6 !important;margin:0 0 14px !important;');
       desc.innerHTML =
-        (message || 'Key hiện tại không hoạt động.') +
+        (message || 'Vui lòng nhập API key từ Google AI Studio.') +
         '<br><a href="https://aistudio.google.com/apikey" target="_blank" ' +
-        'style="color:#8ab4f8 !important;text-decoration:none !important;">Lấy API key (bắt đầu bằng AIza...) tại đây ↗</a>';
+        'style="color:#8ab4f8 !important;text-decoration:none !important;">Mở trang API Keys tại Google AI Studio ↗</a>';
       box.appendChild(desc);
 
       var row = document.createElement('div');
@@ -235,7 +228,7 @@
 
       var keyInput = document.createElement('input');
       keyInput.type = 'text';
-      keyInput.placeholder = 'AIzaSy...';
+      keyInput.placeholder = 'Dán API key vào đây (AQ... hoặc AIza...)';
       keyInput.autocomplete = 'off';
       keyInput.setAttribute('style',
         'flex:1 !important;background:rgba(255,255,255,0.08) !important;' +
