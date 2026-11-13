@@ -168,7 +168,7 @@
         this.modifiedElements.add(turn);
       });
 
-      // D. Unclamp inner response text blocks
+      // D. Unclamp inner response text blocks (only p tags, never generic divs)
       const textBlocks = document.querySelectorAll(`
         model-response p,
         .model-response p,
@@ -180,7 +180,8 @@
 
       textBlocks.forEach((p) => {
         p.style.setProperty('max-width', '100%', 'important');
-        p.style.setProperty('width', '100%', 'important');
+        // Do NOT set width:100% here — Gemini's step/numbered layouts put <p> inside
+        // flex children whose width is controlled by the parent. Forcing 100% rotates text.
         p.style.setProperty('margin-left', '0px', 'important');
         p.style.setProperty('margin-right', '0px', 'important');
         this.modifiedElements.add(p);

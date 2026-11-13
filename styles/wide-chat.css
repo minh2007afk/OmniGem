@@ -113,12 +113,19 @@ body.omnigem-wide-chat-active [class*="text-container"] * {
   max-width: 100% !important;
 }
 
-/* Ensure paragraph, text blocks, headings and lists inside model responses stretch across full width */
+/* Ensure paragraph and list items inside model responses stretch across full width.
+   IMPORTANT: Do NOT add width:100% on generic divs - Gemini uses flex/grid divs
+   internally for numbered step layouts, timelines, and cards. Forcing width:100%
+   on those breaks the layout and causes vertical text distortion. */
 body.omnigem-wide-chat-active model-response p,
 body.omnigem-wide-chat-active model-response ul,
 body.omnigem-wide-chat-active model-response ol,
 body.omnigem-wide-chat-active model-response li,
 body.omnigem-wide-chat-active model-response blockquote,
+body.omnigem-wide-chat-active model-response h1,
+body.omnigem-wide-chat-active model-response h2,
+body.omnigem-wide-chat-active model-response h3,
+body.omnigem-wide-chat-active model-response h4,
 body.omnigem-wide-chat-active .model-response p,
 body.omnigem-wide-chat-active .model-response ul,
 body.omnigem-wide-chat-active .model-response ol,
@@ -126,11 +133,8 @@ body.omnigem-wide-chat-active .response-container p,
 body.omnigem-wide-chat-active .response-container ul,
 body.omnigem-wide-chat-active .response-container ol,
 body.omnigem-wide-chat-active message-content p,
-body.omnigem-wide-chat-active message-content div,
 body.omnigem-wide-chat-active .message-content p,
-body.omnigem-wide-chat-active .message-content div,
-body.omnigem-wide-chat-active markdown p,
-body.omnigem-wide-chat-active markdown div {
+body.omnigem-wide-chat-active markdown p {
   max-width: 100% !important;
   width: 100% !important;
   margin-left: 0 !important;
