@@ -1,54 +1,43 @@
 /* ==========================================================================
    OmniGem - Wide Chat Layout Styles
-   Overrides Gemini's narrow column layout to expand across the entire screen.
-   Safe container-only architecture:
-   - Sets CSS variables to 100%
-   - Unclamps outer conversation/scroll containers
-   - NEVER modifies internal message children, lists, or flex items
+   Mở rộng KHUNG CHAT (ô soạn thảo/nhập tin nhắn ở dưới) để gõ prompt thoải mái,
+   đồng thời GIỮ NGUYÊN KHUNG LỊCH SỬ TIN NHẮN ở độ rộng chuẩn dễ đọc của Gemini.
    ========================================================================== */
 
-/* 1. Gemini native CSS variables override */
-html.omnigem-wide-chat-active,
-body.omnigem-wide-chat-active {
-  --omnigem-wide-max: 100% !important;
-  --chat-max-width: 100% !important;
-  --conversation-width: 100% !important;
-  --input-max-width: 100% !important;
-  --message-max-width: 100% !important;
-  --main-column-max-width: 100% !important;
-  --gem-sys-size-conversation-max-width: 100% !important;
-  --chat-container-width: 100% !important;
-}
-
-/* 2. Uncap the main conversation and scroll containers */
-body.omnigem-wide-chat-active conversation-container,
-body.omnigem-wide-chat-active .conversation-container,
-body.omnigem-wide-chat-active infinite-scroller,
-body.omnigem-wide-chat-active .chat-history {
-  max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  padding-left: 28px !important;
-  padding-right: 28px !important;
-}
-
-/* 3. Bottom input area */
+/* 1. Mở rộng khung chat (Bottom input area & rich textarea) sang hai bên */
 body.omnigem-wide-chat-active .bottom-container,
 body.omnigem-wide-chat-active .input-area-container,
-body.omnigem-wide-chat-active input-area {
+body.omnigem-wide-chat-active input-area,
+body.omnigem-wide-chat-active [class*="input-area"],
+body.omnigem-wide-chat-active [class*="text-input-field"],
+body.omnigem-wide-chat-active [class*="input-box"],
+body.omnigem-wide-chat-active rich-textarea,
+body.omnigem-wide-chat-active .rich-textarea,
+body.omnigem-wide-chat-active [class*="text-area-container"] {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
+}
+
+body.omnigem-wide-chat-active .bottom-container {
   padding-left: 28px !important;
   padding-right: 28px !important;
 }
 
-body.omnigem-wide-chat-active rich-textarea {
+body.omnigem-wide-chat-active rich-textarea [contenteditable="true"],
+body.omnigem-wide-chat-active .ql-editor {
   max-width: 100% !important;
   width: 100% !important;
 }
 
-/* 4. Code blocks and tables expand smoothly */
+/* Thanh công cụ OmniGem trên khung chat cũng mở rộng đồng bộ */
+body.omnigem-wide-chat-active .omnigem-input-toolbar {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. Code blocks và bảng biểu trong chat */
 body.omnigem-wide-chat-active code-block,
 body.omnigem-wide-chat-active .code-block,
 body.omnigem-wide-chat-active pre {
@@ -61,8 +50,7 @@ body.omnigem-wide-chat-active table {
 }
 
 /* --------------------------------------------------------------------------
-   Wide Chat Toggle Button
-   Placed adjacent to Gemini's top-right action buttons (next to ⋮ menu)
+   Nút Bật / Tắt Mở Rộng Khung Chat
    -------------------------------------------------------------------------- */
 #omnigem-wide-toggle-btn {
   width: 38px;
@@ -94,7 +82,7 @@ body.omnigem-wide-chat-active table {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Active state */
+/* Trạng thái BẬT */
 #omnigem-wide-toggle-btn.is-active {
   color: #8ab4f8 !important;
   background-color: rgba(26, 115, 232, 0.25) !important;
