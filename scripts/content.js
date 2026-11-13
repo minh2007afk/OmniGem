@@ -5,6 +5,31 @@
 (() => {
   'use strict';
 
+  /**
+   * Hide the "Gemini là một AI và có thể mắc sai sót." disclaimer bar.
+   * Gemini uses dynamically generated class names so we match by text content.
+   */
+  function hideDisclaimer() {
+    const DISCLAIMER_TEXTS = [
+      'Gemini là một AI',
+      'Gemini is an AI',
+      'mắc sai sót',
+      'may make mistakes',
+      'may display inaccurate',
+      'Review its outputs carefully'
+    ];
+
+    document.querySelectorAll('p, span, div, footer').forEach(el => {
+      const text = el.textContent || '';
+      if (DISCLAIMER_TEXTS.some(t => text.includes(t))) {
+        // Only hide leaf-level or small containers — not the whole chat window
+        if (el.children.length <= 3 && text.length < 200) {
+          el.style.setProperty('display', 'none', 'important');
+        }
+      }
+    });
+  }
+
   async function bootstrapOmniGem() {
     try {
       // 1. If currently on /usage page (either in main tab or inside background sync iframe)
@@ -23,42 +48,47 @@
 
       console.log('[OmniGem] Superpower suite loading on chat UI:', window.location.href);
 
-      // 3. Initialize Wide Chat
+      // 3. Hide disclaimer immediately and keep watching for it on SPA navigation
+      hideDisclaimer();
+      const disclaimerObserver = new MutationObserver(() => hideDisclaimer());
+      disclaimerObserver.observe(document.body, { childList: true, subtree: true });
+
+      // 4. Initialize Wide Chat
       if (window.OmniGemWideChat) {
         await window.OmniGemWideChat.init();
       }
 
-      // 4. Initialize Timestamps
+      // 5. Initialize Timestamps
       if (window.OmniGemTimestamps) {
         await window.OmniGemTimestamps.init();
       }
 
-      // 5. Initialize Folders & Sidebar Navigation
+      // 6. Initialize Folders & Sidebar Navigation
       if (window.OmniGemFolders) {
         await window.OmniGemFolders.init();
       }
 
-      // 6. Initialize Prompt Library & "//" Autocomplete
+      // 7. Initialize Prompt Library & "//" Autocomplete
       if (window.OmniGemPrompts) {
         await window.OmniGemPrompts.init();
       }
 
-      // 7. Initialize Prompt Chains & ",," Multi-Step Workflows
+      // 8. Initialize Prompt Chains & ",," Multi-Step Workflows
       if (window.OmniGemChains) {
         await window.OmniGemChains.init();
       }
 
-      // 8. Initialize Floating Scroll Buttons & Auto-Scroll
+      // 9. Initialize Floating Scroll Buttons & Auto-Scroll
       if (window.OmniGemScroll) {
         window.OmniGemScroll.init();
       }
 
-      // 9. Initialize Usage Counter & Input Toolbar
+      // 10. Initialize Usage Counter & Input Toolbar
       if (window.OmniGemUsage) {
         await window.OmniGemUsage.init();
       }
 
-      // 10. SPA Route Change Listener
+      // 11. SPA Route Change Listener
       if (window.OmniGemDOM) {
         window.OmniGemDOM.onRouteChange(() => {
           if (window.location.pathname.includes('/usage')) {
@@ -67,6 +97,8 @@
             }
             return;
           }
+
+          hideDisclaimer();
 
           if (window.OmniGemWideChat) {
             window.OmniGemWideChat.injectToggleButton();
@@ -95,3 +127,4 @@
     bootstrapOmniGem();
   }
 })();
+

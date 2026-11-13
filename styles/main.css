@@ -89,3 +89,42 @@ body[style*="#131314"] {
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ==========================================================================
+   OmniGem - Global Gemini UI Tweaks
+   ========================================================================== */
+
+/* 1. Hide the "Gemini là một AI và có thể mắc sai sót." disclaimer bar */
+disclaimer-bar,
+.disclaimer-bar,
+[class*="disclaimer"],
+footer.disclaimer,
+.footer-disclaimer,
+.chat-disclaimer,
+p.disclaimer {
+  display: none !important;
+}
+
+/* Target by known Gemini disclaimer text container selectors */
+chat-window footer,
+chat-app footer,
+.bottom-container footer,
+.chat-history ~ footer,
+div[jsname] > p[jsname],
+.disclaimer-container {
+  display: none !important;
+}
+
+/* 2. Reclaim the vertical space freed by hiding the disclaimer.
+      Stretch the bottom input area downward without looking cramped. */
+.bottom-container,
+[class*="bottom-container"] {
+  padding-bottom: 10px !important;
+  margin-bottom: 0 !important;
+}
+
+/* Ensure the content area fills to the bottom of the viewport */
+chat-window,
+chat-app {
+  padding-bottom: 0 !important;
+}
