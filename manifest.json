@@ -9,7 +9,8 @@
     "declarativeNetRequest"
   ],
   "host_permissions": [
-    "*://gemini.google.com/*"
+    "*://gemini.google.com/*",
+    "*://generativelanguage.googleapis.com/*"
   ],
   "declarative_net_request": {
     "rule_resources": [

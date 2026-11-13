@@ -3,6 +3,101 @@
  * Button in input toolbar to AI-enhance the user's prompt before sending.
  */
 
+/* ── API Key Modal ────────────────────────────────────────────── */
+.omnigem-apikey-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.omnigem-apikey-box {
+  position: relative;
+  background: #1e2029;
+  border: 1px solid rgba(138, 180, 248, 0.25);
+  border-radius: 14px;
+  padding: 24px 28px 20px;
+  width: min(420px, 90vw);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.omnigem-apikey-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e8eaed;
+  margin-bottom: 10px;
+}
+
+.omnigem-apikey-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+.omnigem-apikey-desc a {
+  color: #8ab4f8;
+  text-decoration: none;
+}
+.omnigem-apikey-desc a:hover { text-decoration: underline; }
+
+.omnigem-apikey-row {
+  display: flex;
+  gap: 8px;
+}
+
+.omnigem-apikey-row input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(138,180,248,0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #e8eaed;
+  font-size: 13px;
+  font-family: monospace;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.omnigem-apikey-row input:focus {
+  border-color: rgba(138,180,248,0.7);
+}
+
+.omnigem-apikey-save-btn {
+  background: rgba(138,180,248,0.15);
+  border: 1px solid rgba(138,180,248,0.4);
+  border-radius: 8px;
+  color: #8ab4f8;
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.omnigem-apikey-save-btn:hover {
+  background: rgba(138,180,248,0.25);
+}
+
+.omnigem-apikey-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.omnigem-apikey-close-btn:hover { color: rgba(255,255,255,0.8); }
+
 /* ── Wrapper layout ───────────────────────────────────────────── */
 .omnigem-optimize-wrapper {
   display: inline-flex;
