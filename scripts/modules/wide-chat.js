@@ -1,10 +1,7 @@
 /**
  * OmniGem Wide Chat Module
- * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ của AI:
- * - Đoạn văn, tiêu đề, bảng biểu, code
- * - Danh sách số (1, 2, 3), các bước quy trình (①, ②, ③)
- * - Khung chat ở dưới đáy
- * TUYỆT ĐỐI KHÔNG CHẠM VÀO THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
+ * Expands Gemini's chat interface from narrow centered column to full screen width.
+ * Eliminates compounding nested margins and aligns text flush with 24px edge padding.
  */
 (() => {
   'use strict';
@@ -16,8 +13,8 @@
     modifiedElements: new Set(),
 
     async init() {
-      // 1. Load saved state from chrome.storage.local (mặc định BẬT để tiện dụng)
-      this.isWide = await OmniGemStorage.get('wideChatEnabled', true);
+      // 1. Load saved state from chrome.storage.local
+      this.isWide = await OmniGemStorage.get('wideChatEnabled', false);
 
       // 2. Apply layout class immediately
       this.applyLayout(this.isWide);
@@ -25,7 +22,7 @@
       // 3. Inject toggle button into Gemini's top navigation bar
       this.injectToggleButton();
 
-      // 4. Periodically ensure button stays mounted and wide layout stays active
+      // 4. Repeated check to ensure button stays mounted and response width stays enforced
       this.enforceInterval = setInterval(() => {
         if (!document.getElementById(this.buttonId)) {
           this.injectToggleButton();
@@ -33,11 +30,11 @@
         if (this.isWide) {
           this.enforceWideStyles();
         }
-      }, 1200);
+      }, 1000);
 
       // 5. Hook into MutationObserver for newly streamed responses
       OmniGemDOM.onElementAdded(
-        'model-response, message-content, markdown, model-response ol, model-response ul, model-response li',
+        'model-response, .model-response, message-content, markdown, .presented-response',
         () => {
           if (this.isWide) {
             this.enforceWideStyles();
@@ -69,56 +66,139 @@
     },
 
     /**
-     * Mở rộng phần kết quả trả về của AI và khung chat.
-     * TUYỆT ĐỐI BỎ QUA TOÀN BỘ CÁC PHẦN TỬ THUỘC SIDEBAR / LỊCH SỬ CHAT BÊN TRÁI.
+     * Programmatically unclamp ancestor containers, side paddings, and inner response text
      */
     enforceWideStyles() {
       if (!this.isWide) return;
 
-      const elements = document.querySelectorAll(
-        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, response-container, model-response, message-content, .presented-response, markdown, model-response ol, model-response ul, model-response li, markdown ol, markdown ul, markdown li, model-response [class*="stepper"], model-response [class*="timeline"], model-response [class*="structured-list"], model-response [class*="step-content"], model-response [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
-      );
+      // A. Unclamp ancestor hierarchy from model responses upwards (set to 100% flush width)
+      const sampleResponse = document.querySelector('model-response, .model-response, response-container');
+      if (sampleResponse) {
+        let el = sampleResponse.parentElement;
+        while (el && el !== document.body && el !== document.documentElement) {
+          // Do not touch sidebars or top headers
+          const tag = el.tagName.toLowerCase();
+          if (
+            tag.includes('side') ||
+            el.classList.contains('side-nav') ||
+            tag === 'header' ||
+            tag === 'top-nav' ||
+            tag === 'chat-app' ||
+            tag === 'main' ||
+            el.getAttribute('role') === 'banner' ||
+            el.classList.contains('top-container') ||
+            el.classList.contains('trailing-actions') ||
+            el.classList.contains('top-nav-actions')
+          ) {
+            break;
+          }
 
-      elements.forEach(el => {
-        // BẢO VỆ TUYỆT ĐỐI: Không bao giờ chạm vào thanh lịch sử chat bên trái
-        if (el.closest('bard-sidenav, side-nav, [role="navigation"], .side-nav, .bard-sidenav')) {
-          return;
-        }
+          const cs = window.getComputedStyle(el);
+          const pLeft = parseFloat(cs.paddingLeft) || 0;
+          const pRight = parseFloat(cs.paddingRight) || 0;
 
-        const tag = el.tagName.toLowerCase();
-        const cs = window.getComputedStyle(el);
-
-        // Mở rộng max-width nếu bị giới hạn
-        if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
-          // Bỏ qua các icon / huy hiệu số tròn nhỏ (< 50px) để không méo hình
-          if (el.offsetWidth > 50 || tag === 'ol' || tag === 'ul' || tag === 'li') {
-            el.style.setProperty('max-width', '100%', 'important');
+          // Zero out large paddings and auto margins on wrappers to stop compounding shrink
+          if (pLeft > 24) {
+            el.style.setProperty('padding-left', '0px', 'important');
             this.modifiedElements.add(el);
           }
-        }
+          if (pRight > 24) {
+            el.style.setProperty('padding-right', '0px', 'important');
+            this.modifiedElements.add(el);
+          }
 
-        // Với thẻ ol, ul trong model-response: mở rộng 100% width và xóa margin auto
-        if (tag === 'ol' || tag === 'ul') {
-          if (cs.marginLeft === 'auto' || cs.marginRight === 'auto' || cs.width !== '100%') {
-            el.style.setProperty('width', '100%', 'important');
+          if (cs.marginLeft === 'auto' || parseFloat(cs.marginLeft) > 30) {
             el.style.setProperty('margin-left', '0px', 'important');
+            this.modifiedElements.add(el);
+          }
+          if (cs.marginRight === 'auto' || parseFloat(cs.marginRight) > 30) {
             el.style.setProperty('margin-right', '0px', 'important');
             this.modifiedElements.add(el);
           }
+
+          // Force wrappers to 100% width
+          if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
+            el.style.setProperty('max-width', '100%', 'important');
+            this.modifiedElements.add(el);
+          }
+          if (cs.width && cs.width !== '100%') {
+            el.style.setProperty('width', '100%', 'important');
+            this.modifiedElements.add(el);
+          }
+
+          el = el.parentElement;
         }
+      }
+
+      // B. Unclamp bottom input bar hierarchy
+      const bottomArea = document.querySelector('.bottom-container, [class*="bottom-container"], input-area, rich-textarea');
+      if (bottomArea) {
+        let bEl = bottomArea;
+        while (bEl && bEl !== document.body) {
+          if (bEl.tagName.toLowerCase().includes('side')) break;
+          const bcs = window.getComputedStyle(bEl);
+          if (bcs.maxWidth && bcs.maxWidth !== 'none' && !bcs.maxWidth.includes('100%')) {
+            bEl.style.setProperty('max-width', '100%', 'important');
+            bEl.style.setProperty('width', '100%', 'important');
+            this.modifiedElements.add(bEl);
+          }
+          bEl = bEl.parentElement;
+        }
+      }
+
+      // C. Ensure message turns have balanced padding and 100% width (72px on right to prevent colliding with top header buttons)
+      const messageTurns = document.querySelectorAll(`
+        model-response,
+        .model-response,
+        user-query,
+        .user-query-container,
+        response-container,
+        .response-container,
+        ms-chat-turn
+      `);
+
+      messageTurns.forEach((turn) => {
+        turn.style.setProperty('max-width', '100%', 'important');
+        turn.style.setProperty('width', '100%', 'important');
+        turn.style.setProperty('box-sizing', 'border-box', 'important');
+        turn.style.setProperty('padding-left', '32px', 'important');
+        turn.style.setProperty('padding-right', '72px', 'important');
+        turn.style.setProperty('margin-left', '0px', 'important');
+        turn.style.setProperty('margin-right', '0px', 'important');
+        this.modifiedElements.add(turn);
+      });
+
+      // D. Unclamp inner response text blocks (never force width: 100% as that breaks flex/grid items)
+      const textBlocks = document.querySelectorAll(`
+        model-response p,
+        .model-response p,
+        message-content p,
+        .message-content p,
+        markdown p,
+        .markdown p
+      `);
+
+      textBlocks.forEach((p) => {
+        p.style.setProperty('max-width', '100%', 'important');
+        p.style.setProperty('margin-left', '0px', 'important');
+        p.style.setProperty('margin-right', '0px', 'important');
+        this.modifiedElements.add(p);
       });
     },
 
     /**
-     * Khôi phục kích thước ban đầu khi tắt chế độ
+     * Clear all inline width & padding overrides when wide chat is disabled
      */
     clearWideStyles() {
       this.modifiedElements.forEach((el) => {
         if (el && el.style) {
           el.style.removeProperty('max-width');
           el.style.removeProperty('width');
+          el.style.removeProperty('padding-left');
+          el.style.removeProperty('padding-right');
           el.style.removeProperty('margin-left');
           el.style.removeProperty('margin-right');
+          el.style.removeProperty('box-sizing');
         }
       });
       this.modifiedElements.clear();
