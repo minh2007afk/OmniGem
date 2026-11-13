@@ -1,9 +1,8 @@
 /* ==========================================================================
    OmniGem - Wide Chat Layout Styles
-   Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ:
-   - Các đoạn văn, tiêu đề, khối code, bảng biểu
-   - Danh sách có thứ tự (1, 2, 3), các bước quy trình (①, ②, ③)
-   - Khung chat ở dưới đáy
+   Mở rộng PHẦN KẾT QUẢ TRẢ VỀ của AI (đoạn văn, tiêu đề, danh sách 1 2 3,
+   quy trình bước ① ② ③, code, bảng) và KHUNG CHAT dưới đáy.
+   TUYỆT ĐỐI KHÔNG ẢNH HƯỞNG ĐẾN THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
    ========================================================================== */
 
 /* 1. Thiết lập các biến CSS gốc của Google Gemini */
@@ -19,19 +18,21 @@ body.omnigem-wide-chat-active {
   --chat-container-width: 100% !important;
 }
 
-/* 2. Khung cuộn hội thoại chính: Mở rộng 100% với đệm lề 48px thoáng mắt */
-body.omnigem-wide-chat-active conversation-container,
-body.omnigem-wide-chat-active .conversation-container,
-body.omnigem-wide-chat-active infinite-scroller,
-body.omnigem-wide-chat-active .chat-history {
+/* 2. Khung cuộn hội thoại chính (CHỈ ÁP DỤNG TRONG MAIN / CHAT-WINDOW, KHÔNG ĐỤNG SIDEBAR) */
+body.omnigem-wide-chat-active chat-window conversation-container,
+body.omnigem-wide-chat-active chat-window .conversation-container,
+body.omnigem-wide-chat-active main conversation-container,
+body.omnigem-wide-chat-active main .conversation-container,
+body.omnigem-wide-chat-active chat-window infinite-scroller,
+body.omnigem-wide-chat-active main infinite-scroller {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: 48px !important;
-  padding-right: 48px !important;
+  padding-left: 36px !important;
+  padding-right: 36px !important;
 }
 
-/* 3. PHẦN KẾT QUẢ TRẢ VỀ (AI Response Containers) */
+/* 3. PHẦN KẾT QUẢ TRẢ VỀ CỦA AI (Scoped strictly under model-response / message-content) */
 body.omnigem-wide-chat-active ms-chat-turn,
 body.omnigem-wide-chat-active .chat-turn,
 body.omnigem-wide-chat-active response-container,
@@ -48,7 +49,7 @@ body.omnigem-wide-chat-active .markdown {
   box-sizing: border-box !important;
 }
 
-/* 4. Các khối văn bản, tiêu đề, trích dẫn */
+/* 4. Các khối văn bản, tiêu đề, trích dẫn trong kết quả */
 body.omnigem-wide-chat-active model-response p,
 body.omnigem-wide-chat-active model-response h1,
 body.omnigem-wide-chat-active model-response h2,
@@ -62,18 +63,19 @@ body.omnigem-wide-chat-active markdown blockquote {
   max-width: 100% !important;
 }
 
-/* 5. MỞ RỘNG CÁC PHẦN DANH SÁCH (1, 2, 3), QUY TRÌNH BƯỚC (①, ②, ③) */
+/* 5. MỞ RỘNG DANH SÁCH 1, 2, 3 VÀ CÁC BƯỚC ① ② ③ (CHỈ TRONG PHẢN HỒI CỦA AI) */
 body.omnigem-wide-chat-active model-response ol,
 body.omnigem-wide-chat-active model-response ul,
 body.omnigem-wide-chat-active markdown ol,
 body.omnigem-wide-chat-active markdown ul,
 body.omnigem-wide-chat-active message-content ol,
 body.omnigem-wide-chat-active message-content ul,
-body.omnigem-wide-chat-active .presented-response ol,
-body.omnigem-wide-chat-active .presented-response ul,
-body.omnigem-wide-chat-active [class*="stepper"],
-body.omnigem-wide-chat-active [class*="timeline"],
-body.omnigem-wide-chat-active [class*="structured-list"] {
+body.omnigem-wide-chat-active model-response [class*="stepper"],
+body.omnigem-wide-chat-active model-response [class*="timeline"],
+body.omnigem-wide-chat-active model-response [class*="structured-list"],
+body.omnigem-wide-chat-active markdown [class*="stepper"],
+body.omnigem-wide-chat-active markdown [class*="timeline"],
+body.omnigem-wide-chat-active markdown [class*="structured-list"] {
   max-width: 100% !important;
   width: 100% !important;
   margin-left: 0 !important;
@@ -81,18 +83,19 @@ body.omnigem-wide-chat-active [class*="structured-list"] {
   box-sizing: border-box !important;
 }
 
-/* Mở rộng từng dòng mục con li và phần nội dung text bên trong */
+/* Mở rộng từng dòng li trong phản hồi AI */
 body.omnigem-wide-chat-active model-response li,
 body.omnigem-wide-chat-active markdown li,
 body.omnigem-wide-chat-active message-content li,
-body.omnigem-wide-chat-active [class*="step-content"],
-body.omnigem-wide-chat-active [class*="step-body"] {
+body.omnigem-wide-chat-active model-response [class*="step-content"],
+body.omnigem-wide-chat-active model-response [class*="step-body"],
+body.omnigem-wide-chat-active markdown [class*="step-content"],
+body.omnigem-wide-chat-active markdown [class*="step-body"] {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 
-/* Các đoạn văn và text bên trong li */
 body.omnigem-wide-chat-active model-response li p,
 body.omnigem-wide-chat-active markdown li p,
 body.omnigem-wide-chat-active message-content li p {
@@ -111,7 +114,7 @@ body.omnigem-wide-chat-active table {
   max-width: 100% !important;
 }
 
-/* 7. Khung chat ở dưới đáy (Input bar): Mở rộng đồng bộ theo lề 48px */
+/* 7. Khung chat ở dưới đáy (Input bar): Mở rộng đồng bộ */
 body.omnigem-wide-chat-active .bottom-container,
 body.omnigem-wide-chat-active .input-area-container,
 body.omnigem-wide-chat-active input-area,
@@ -123,8 +126,8 @@ body.omnigem-wide-chat-active [class*="input-box"] {
 }
 
 body.omnigem-wide-chat-active .bottom-container {
-  padding-left: 48px !important;
-  padding-right: 48px !important;
+  padding-left: 36px !important;
+  padding-right: 36px !important;
 }
 
 body.omnigem-wide-chat-active rich-textarea [contenteditable="true"],
@@ -135,6 +138,17 @@ body.omnigem-wide-chat-active .ql-editor {
 body.omnigem-wide-chat-active .omnigem-input-toolbar {
   max-width: 100% !important;
   box-sizing: border-box !important;
+}
+
+/* 8. BẢO VỆ TUYỆT ĐỐI THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI:
+      Không bao giờ cho phép bất kỳ class wide-chat nào can thiệp vào sidebar */
+bard-sidenav,
+side-nav,
+[role="navigation"],
+.side-nav,
+.bard-sidenav {
+  box-sizing: border-box !important;
+  max-width: none !important;
 }
 
 /* --------------------------------------------------------------------------

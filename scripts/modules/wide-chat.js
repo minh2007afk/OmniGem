@@ -1,9 +1,10 @@
 /**
  * OmniGem Wide Chat Module
- * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ:
+ * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ của AI:
  * - Đoạn văn, tiêu đề, bảng biểu, code
  * - Danh sách số (1, 2, 3), các bước quy trình (①, ②, ③)
  * - Khung chat ở dưới đáy
+ * TUYỆT ĐỐI BẢO VỆ THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
  */
 (() => {
   'use strict';
@@ -36,7 +37,7 @@
 
       // 5. Hook into MutationObserver for newly streamed responses
       OmniGemDOM.onElementAdded(
-        'model-response, message-content, markdown, ol, ul, li, .presented-response',
+        'model-response, message-content, markdown, model-response ol, model-response ul, model-response li',
         () => {
           if (this.isWide) {
             this.enforceWideStyles();
@@ -68,16 +69,23 @@
     },
 
     /**
-     * Mở rộng phần kết quả trả về bao gồm cả danh sách 1, 2, 3 và các bước ① ② ③
+     * Mở rộng phần kết quả trả về của AI và khung chat.
+     * TUYỆT ĐỐI BỎ QUA TOÀN BỘ CÁC PHẦN TỬ THUỘC SIDEBAR / LỊCH SỬ CHAT BÊN TRÁI.
      */
     enforceWideStyles() {
       if (!this.isWide) return;
 
+      // CHỈ truy vấn các phần tử trong chat-window hoặc main, loại trừ hoàn toàn sidebar
       const elements = document.querySelectorAll(
-        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, .chat-turn, response-container, .response-container, model-response, .model-response, message-content, .message-content, .presented-response, markdown, .markdown, ol, ul, li, [class*="stepper"], [class*="timeline"], [class*="structured-list"], [class*="step-content"], [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
+        'chat-window conversation-container, main conversation-container, infinite-scroller, ms-chat-turn, response-container, model-response, message-content, .presented-response, markdown, model-response ol, model-response ul, model-response li, markdown ol, markdown ul, markdown li, model-response [class*="stepper"], model-response [class*="timeline"], model-response [class*="structured-list"], model-response [class*="step-content"], model-response [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
       );
 
       elements.forEach(el => {
+        // BẢO VỆ TUYỆT ĐỐI: Bỏ qua nếu phần tử nằm trong sidebar lịch sử chat
+        if (el.closest('bard-sidenav, side-nav, [role="navigation"], .side-nav, .bard-sidenav')) {
+          return;
+        }
+
         const tag = el.tagName.toLowerCase();
         const cs = window.getComputedStyle(el);
 
@@ -90,7 +98,7 @@
           }
         }
 
-        // Với thẻ ol, ul: mở rộng 100% width và xóa margin auto để không bị bó ở giữa
+        // Với thẻ ol, ul trong model-response: mở rộng 100% width và xóa margin auto
         if (tag === 'ol' || tag === 'ul') {
           if (cs.marginLeft === 'auto' || cs.marginRight === 'auto' || cs.width !== '100%') {
             el.style.setProperty('width', '100%', 'important');
