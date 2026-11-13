@@ -243,21 +243,52 @@
         this.toggle();
       });
 
-      // Target top-right menu container or 3-dots button (⋮)
-      const moreBtn = document.querySelector(
-        'button[aria-label*="More"], button[aria-label*="Thêm"], button[aria-label*="tùy chọn"], button[aria-label*="Options"], [data-test-id="more-menu-button"], button[aria-haspopup="menu"]'
-      );
+      // Strategy: find the top-right header area only (avoid sidebar matches)
+      // 1. Look for action containers in the actual header/top bar
+      const headerZone = document.querySelector('header') ||
+                         document.querySelector('[role="banner"]') ||
+                         document.querySelector('top-nav');
 
-      const headerContainer = document.querySelector(
-        'header .trailing-actions, header .top-nav-actions, .top-container, top-nav, div[role="banner"]'
-      );
+      // 2. Within header, find the right-side actions or the ⋮ button
+      let injected = false;
 
-      if (moreBtn && moreBtn.parentElement) {
-        moreBtn.parentElement.insertBefore(btn, moreBtn);
-      } else if (headerContainer) {
-        headerContainer.appendChild(btn);
-      } else {
+      if (headerZone) {
+        // Try to find the ⋮ button specifically inside header
+        const moreBtn = headerZone.querySelector(
+          'button[aria-label*="More"], button[aria-label*="Thêm"], ' +
+          'button[aria-label*="tùy chọn"], button[aria-label*="Options"]'
+        );
+
+        if (moreBtn && moreBtn.parentElement) {
+          moreBtn.parentElement.insertBefore(btn, moreBtn);
+          injected = true;
+        } else {
+          // Try a trailing-actions / right-side container inside header
+          const trailingActions = headerZone.querySelector(
+            '.trailing-actions, .top-nav-actions, [class*="actions"]'
+          );
+          if (trailingActions) {
+            trailingActions.appendChild(btn);
+            injected = true;
+          }
+        }
+      }
+
+      // 3. Fallback: top-right header containers outside a <header> tag
+      if (!injected) {
+        const topContainer = document.querySelector(
+          'header .trailing-actions, header .top-nav-actions, .top-container'
+        );
+        if (topContainer) {
+          topContainer.appendChild(btn);
+          injected = true;
+        }
+      }
+
+      // 4. Last resort: fixed floating position top-right
+      if (!injected) {
         btn.classList.add('omnigem-floating-anchor');
+        btn.style.cssText = 'position:fixed;top:8px;right:48px;z-index:99990;';
         document.body.appendChild(btn);
       }
 
