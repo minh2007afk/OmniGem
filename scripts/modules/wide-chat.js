@@ -83,6 +83,8 @@
             el.classList.contains('side-nav') ||
             tag === 'header' ||
             tag === 'top-nav' ||
+            tag === 'chat-app' ||
+            tag === 'main' ||
             el.getAttribute('role') === 'banner' ||
             el.classList.contains('top-container') ||
             el.classList.contains('trailing-actions') ||
@@ -250,17 +252,6 @@
       );
 
       if (moreBtn && moreBtn.parentElement) {
-        // Guarantee 3-dots button stays elevated, fully clickable, and never covered
-        moreBtn.style.setProperty('position', 'relative', 'important');
-        moreBtn.style.setProperty('z-index', '10001', 'important');
-        moreBtn.style.setProperty('pointer-events', 'auto', 'important');
-        moreBtn.style.setProperty('cursor', 'pointer', 'important');
-
-        moreBtn.parentElement.style.setProperty('position', 'relative', 'important');
-        moreBtn.parentElement.style.setProperty('z-index', '10000', 'important');
-        moreBtn.parentElement.style.setProperty('pointer-events', 'auto', 'important');
-        moreBtn.parentElement.style.setProperty('overflow', 'visible', 'important');
-
         moreBtn.parentElement.insertBefore(btn, moreBtn);
       } else if (headerContainer) {
         headerContainer.appendChild(btn);
