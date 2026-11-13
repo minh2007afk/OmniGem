@@ -1,43 +1,64 @@
 /* ==========================================================================
    OmniGem - Wide Chat Layout Styles
-   Mở rộng KHUNG CHAT (ô soạn thảo/nhập tin nhắn ở dưới) để gõ prompt thoải mái,
-   đồng thời GIỮ NGUYÊN KHUNG LỊCH SỬ TIN NHẮN ở độ rộng chuẩn dễ đọc của Gemini.
+   Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ (model-response, markdown, paragraphs)
+   và KHUNG CHAT sang toàn màn hình, giữ nguyên sidebar và header.
    ========================================================================== */
 
-/* 1. Mở rộng khung chat (Bottom input area & rich textarea) sang hai bên */
-body.omnigem-wide-chat-active .bottom-container,
-body.omnigem-wide-chat-active .input-area-container,
-body.omnigem-wide-chat-active input-area,
-body.omnigem-wide-chat-active [class*="input-area"],
-body.omnigem-wide-chat-active [class*="text-input-field"],
-body.omnigem-wide-chat-active [class*="input-box"],
-body.omnigem-wide-chat-active rich-textarea,
-body.omnigem-wide-chat-active .rich-textarea,
-body.omnigem-wide-chat-active [class*="text-area-container"] {
+/* 1. Thiết lập các biến CSS gốc của Google Gemini */
+html.omnigem-wide-chat-active,
+body.omnigem-wide-chat-active {
+  --omnigem-wide-max: 100% !important;
+  --chat-max-width: 100% !important;
+  --conversation-width: 100% !important;
+  --input-max-width: 100% !important;
+  --message-max-width: 100% !important;
+  --main-column-max-width: 100% !important;
+  --gem-sys-size-conversation-max-width: 100% !important;
+  --chat-container-width: 100% !important;
+}
+
+/* 2. Khung cuộn hội thoại chính: Mở rộng 100% với đệm lề 48px thoáng mắt */
+body.omnigem-wide-chat-active conversation-container,
+body.omnigem-wide-chat-active .conversation-container,
+body.omnigem-wide-chat-active infinite-scroller,
+body.omnigem-wide-chat-active .chat-history {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  padding-left: 48px !important;
+  padding-right: 48px !important;
 }
 
-body.omnigem-wide-chat-active .bottom-container {
-  padding-left: 28px !important;
-  padding-right: 28px !important;
-}
-
-body.omnigem-wide-chat-active rich-textarea [contenteditable="true"],
-body.omnigem-wide-chat-active .ql-editor {
+/* 3. PHẦN KẾT QUẢ TRẢ VỀ (AI Response): Mở rộng toàn bộ chiều ngang */
+body.omnigem-wide-chat-active ms-chat-turn,
+body.omnigem-wide-chat-active .chat-turn,
+body.omnigem-wide-chat-active response-container,
+body.omnigem-wide-chat-active .response-container,
+body.omnigem-wide-chat-active model-response,
+body.omnigem-wide-chat-active .model-response,
+body.omnigem-wide-chat-active message-content,
+body.omnigem-wide-chat-active .message-content,
+body.omnigem-wide-chat-active .presented-response,
+body.omnigem-wide-chat-active markdown,
+body.omnigem-wide-chat-active .markdown {
   max-width: 100% !important;
-  width: 100% !important;
 }
 
-/* Thanh công cụ OmniGem trên khung chat cũng mở rộng đồng bộ */
-body.omnigem-wide-chat-active .omnigem-input-toolbar {
+/* Các khối đoạn văn, tiêu đề trong kết quả trả về */
+body.omnigem-wide-chat-active model-response p,
+body.omnigem-wide-chat-active model-response h1,
+body.omnigem-wide-chat-active model-response h2,
+body.omnigem-wide-chat-active model-response h3,
+body.omnigem-wide-chat-active model-response blockquote,
+body.omnigem-wide-chat-active markdown p,
+body.omnigem-wide-chat-active markdown h1,
+body.omnigem-wide-chat-active markdown h2,
+body.omnigem-wide-chat-active markdown h3,
+body.omnigem-wide-chat-active markdown blockquote {
   max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
 }
 
-/* 2. Code blocks và bảng biểu trong chat */
+/* Khối code và bảng biểu trải rộng mượt mà */
 body.omnigem-wide-chat-active code-block,
 body.omnigem-wide-chat-active .code-block,
 body.omnigem-wide-chat-active pre {
@@ -49,8 +70,34 @@ body.omnigem-wide-chat-active table {
   max-width: 100% !important;
 }
 
+/* 4. Khung chat ở dưới đáy (Input bar): Mở rộng đồng bộ theo lề 48px */
+body.omnigem-wide-chat-active .bottom-container,
+body.omnigem-wide-chat-active .input-area-container,
+body.omnigem-wide-chat-active input-area,
+body.omnigem-wide-chat-active rich-textarea,
+body.omnigem-wide-chat-active [class*="text-input-field"],
+body.omnigem-wide-chat-active [class*="input-box"] {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.omnigem-wide-chat-active .bottom-container {
+  padding-left: 48px !important;
+  padding-right: 48px !important;
+}
+
+body.omnigem-wide-chat-active rich-textarea [contenteditable="true"],
+body.omnigem-wide-chat-active .ql-editor {
+  max-width: 100% !important;
+}
+
+body.omnigem-wide-chat-active .omnigem-input-toolbar {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 /* --------------------------------------------------------------------------
-   Nút Bật / Tắt Mở Rộng Khung Chat
+   Nút Bật / Tắt Mở Rộng (Wide Chat Toggle Button)
    -------------------------------------------------------------------------- */
 #omnigem-wide-toggle-btn {
   width: 38px;

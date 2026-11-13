@@ -1,7 +1,7 @@
 /**
  * OmniGem Wide Chat Module
- * Mở rộng KHUNG CHAT (ô soạn thảo/nhập tin nhắn ở dưới) sang toàn màn hình,
- * giữ nguyên khung lịch sử đọc tin nhắn ở giữa dễ đọc và chuẩn mực.
+ * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ (model-response, markdown) và KHUNG CHAT
+ * sang toàn màn hình, không đụng tới sidebar hay làm vỡ danh sách số/flex items.
  */
 (() => {
   'use strict';
@@ -32,7 +32,18 @@
         }
       }, 1200);
 
-      // 5. Listen for storage changes
+      // 5. Hook into MutationObserver for newly streamed responses
+      OmniGemDOM.onElementAdded(
+        'model-response, message-content, markdown, .presented-response',
+        () => {
+          if (this.isWide) {
+            this.enforceWideStyles();
+          }
+        },
+        'data-omnigem-wide-enforced'
+      );
+
+      // 6. Listen for storage changes
       OmniGemStorage.onChanged((changes) => {
         if (changes.wideChatEnabled !== undefined) {
           this.isWide = changes.wideChatEnabled.newValue;
@@ -55,49 +66,32 @@
     },
 
     /**
-     * Mở rộng riêng khung chat (ô soạn thảo tin nhắn ở dưới).
-     * Tuyệt đối không can thiệp vào khung lịch sử tin nhắn ở trên.
+     * Mở rộng phần kết quả trả về và khung chat bằng cách unclamp max-width.
+     * TUYỆT ĐỐI KHÔNG set width: 100% để không làm vỡ các flex items con (như số thứ tự ① ② ③).
      */
     enforceWideStyles() {
       if (!this.isWide) return;
 
-      // 1. Tìm ô soạn thảo rich-textarea và unclamp toàn bộ các thẻ bọc nó lên tới bottom-container
-      const inputEl = document.querySelector('rich-textarea');
-      if (inputEl) {
-        let el = inputEl;
-        while (el && el !== document.body) {
-          const tag = el.tagName.toLowerCase();
-          if (tag.includes('side') || tag === 'header' || tag === 'main' || tag === 'chat-app') {
-            break;
-          }
-          const cs = window.getComputedStyle(el);
-          if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
-            el.style.setProperty('max-width', '100%', 'important');
-            this.modifiedElements.add(el);
-          }
-          el = el.parentElement;
-        }
-      }
-
-      // 2. Unclamp các class/thẻ chứa khung chat ở dưới
-      const inputContainers = document.querySelectorAll(
-        '.bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"], [class*="text-area-container"]'
+      const elements = document.querySelectorAll(
+        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, .chat-turn, response-container, .response-container, model-response, .model-response, message-content, .message-content, .presented-response, markdown, .markdown, .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
       );
-      inputContainers.forEach(el => {
-        el.style.setProperty('max-width', '100%', 'important');
-        el.style.setProperty('width', '100%', 'important');
-        this.modifiedElements.add(el);
+
+      elements.forEach(el => {
+        const cs = window.getComputedStyle(el);
+        if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
+          el.style.setProperty('max-width', '100%', 'important');
+          this.modifiedElements.add(el);
+        }
       });
     },
 
     /**
-     * Khôi phục kích thước khung chat khi tắt chế độ
+     * Khôi phục kích thước ban đầu khi tắt chế độ
      */
     clearWideStyles() {
       this.modifiedElements.forEach((el) => {
         if (el && el.style) {
           el.style.removeProperty('max-width');
-          el.style.removeProperty('width');
         }
       });
       this.modifiedElements.clear();
@@ -116,11 +110,11 @@
 
       if (this.isWide) {
         btn.classList.add('is-active');
-        btn.setAttribute('data-tooltip', 'Khung chat rộng: BẬT (↔ Toàn màn hình)');
+        btn.setAttribute('data-tooltip', 'Wide Chat: BẬT (↔ Toàn màn hình)');
         btn.setAttribute('aria-pressed', 'true');
       } else {
         btn.classList.remove('is-active');
-        btn.setAttribute('data-tooltip', 'Khung chat rộng: TẮT (Click để mở rộng)');
+        btn.setAttribute('data-tooltip', 'Wide Chat: TẮT (Click để mở rộng)');
         btn.setAttribute('aria-pressed', 'false');
       }
     },
