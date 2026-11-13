@@ -3,6 +3,25 @@
  * Button in input toolbar to AI-enhance the user's prompt before sending.
  */
 
+/* ── Wrapper layout ───────────────────────────────────────────── */
+.omnigem-optimize-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Word / char count ────────────────────────────────────────── */
+.omnigem-word-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Optimize button (default state) ─────────────────────────── */
 .omnigem-optimize-btn {
   display: inline-flex;
