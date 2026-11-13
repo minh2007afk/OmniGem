@@ -12,7 +12,7 @@
   if (window.self !== window.top) return;
 
   const API_KEY_STORAGE = 'omnigem_gemini_api_key';
-  const API_MODEL       = 'gemini-2.5-flash';
+  const API_MODEL       = 'gemini-3.8-flash';
   const API_URL         = 'https://generativelanguage.googleapis.com/v1beta/models/' + API_MODEL + ':generateContent';
 
   // No hardcoded key — user enters via Settings or modal prompt
