@@ -149,12 +149,19 @@
 
       console.log('[OmniGem Optimize] Sending to:', API_URL);
 
-      var res = await fetch(API_URL + '?key=' + apiKey, {
+      var url = API_URL;
+      var headers = {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      };
+      // Legacy AIza keys accept ?key=, but newer AQ. auth keys trigger ACCESS_TOKEN_TYPE_UNSUPPORTED if put in query param
+      if (apiKey.startsWith('AIza')) {
+        url += '?key=' + apiKey;
+      }
+
+      var res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
-        },
+        headers: headers,
         body: JSON.stringify({
           contents: [{ parts: [{ text: metaPrompt }] }],
           generationConfig: {
