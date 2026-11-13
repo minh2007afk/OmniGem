@@ -1,7 +1,9 @@
 /**
  * OmniGem Wide Chat Module
- * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ (model-response, markdown) và KHUNG CHAT
- * sang toàn màn hình, không đụng tới sidebar hay làm vỡ danh sách số/flex items.
+ * Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ:
+ * - Đoạn văn, tiêu đề, bảng biểu, code
+ * - Danh sách số (1, 2, 3), các bước quy trình (①, ②, ③)
+ * - Khung chat ở dưới đáy
  */
 (() => {
   'use strict';
@@ -34,7 +36,7 @@
 
       // 5. Hook into MutationObserver for newly streamed responses
       OmniGemDOM.onElementAdded(
-        'model-response, message-content, markdown, .presented-response',
+        'model-response, message-content, markdown, ol, ul, li, .presented-response',
         () => {
           if (this.isWide) {
             this.enforceWideStyles();
@@ -66,21 +68,36 @@
     },
 
     /**
-     * Mở rộng phần kết quả trả về và khung chat bằng cách unclamp max-width.
-     * TUYỆT ĐỐI KHÔNG set width: 100% để không làm vỡ các flex items con (như số thứ tự ① ② ③).
+     * Mở rộng phần kết quả trả về bao gồm cả danh sách 1, 2, 3 và các bước ① ② ③
      */
     enforceWideStyles() {
       if (!this.isWide) return;
 
       const elements = document.querySelectorAll(
-        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, .chat-turn, response-container, .response-container, model-response, .model-response, message-content, .message-content, .presented-response, markdown, .markdown, .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
+        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, .chat-turn, response-container, .response-container, model-response, .model-response, message-content, .message-content, .presented-response, markdown, .markdown, ol, ul, li, [class*="stepper"], [class*="timeline"], [class*="structured-list"], [class*="step-content"], [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
       );
 
       elements.forEach(el => {
+        const tag = el.tagName.toLowerCase();
         const cs = window.getComputedStyle(el);
+
+        // Mở rộng max-width nếu bị giới hạn
         if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
-          el.style.setProperty('max-width', '100%', 'important');
-          this.modifiedElements.add(el);
+          // Bỏ qua các icon / huy hiệu số tròn nhỏ (< 50px) để không méo hình
+          if (el.offsetWidth > 50 || tag === 'ol' || tag === 'ul' || tag === 'li') {
+            el.style.setProperty('max-width', '100%', 'important');
+            this.modifiedElements.add(el);
+          }
+        }
+
+        // Với thẻ ol, ul: mở rộng 100% width và xóa margin auto để không bị bó ở giữa
+        if (tag === 'ol' || tag === 'ul') {
+          if (cs.marginLeft === 'auto' || cs.marginRight === 'auto' || cs.width !== '100%') {
+            el.style.setProperty('width', '100%', 'important');
+            el.style.setProperty('margin-left', '0px', 'important');
+            el.style.setProperty('margin-right', '0px', 'important');
+            this.modifiedElements.add(el);
+          }
         }
       });
     },
@@ -92,6 +109,9 @@
       this.modifiedElements.forEach((el) => {
         if (el && el.style) {
           el.style.removeProperty('max-width');
+          el.style.removeProperty('width');
+          el.style.removeProperty('margin-left');
+          el.style.removeProperty('margin-right');
         }
       });
       this.modifiedElements.clear();
