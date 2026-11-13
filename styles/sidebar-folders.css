@@ -138,9 +138,7 @@
    -------------------------------------------------------------------------- */
 bard-sidenav.collapsed .omnigem-sidebar-header,
 side-nav.collapsed .omnigem-sidebar-header,
-[class*="side-nav"][class*="collapsed"] .omnigem-sidebar-header,
-bard-sidenav[style*="width: 6"],
-side-nav[style*="width: 6"] {
+[class*="side-nav"][class*="collapsed"] .omnigem-sidebar-header {
   display: none !important;
 }
 

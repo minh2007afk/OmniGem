@@ -1,8 +1,8 @@
 /* ==========================================================================
    OmniGem - Wide Chat Layout Styles
-   Mở rộng PHẦN KẾT QUẢ TRẢ VỀ của AI (đoạn văn, tiêu đề, danh sách 1 2 3,
+   Mở rộng toàn bộ PHẦN KẾT QUẢ TRẢ VỀ của AI (đoạn văn, tiêu đề, danh sách 1 2 3,
    quy trình bước ① ② ③, code, bảng) và KHUNG CHAT dưới đáy.
-   TUYỆT ĐỐI KHÔNG ẢNH HƯỞNG ĐẾN THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
+   TUYỆT ĐỐI KHÔNG CAN THIỆP VÀO THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
    ========================================================================== */
 
 /* 1. Thiết lập các biến CSS gốc của Google Gemini */
@@ -18,18 +18,17 @@ body.omnigem-wide-chat-active {
   --chat-container-width: 100% !important;
 }
 
-/* 2. Khung cuộn hội thoại chính (CHỈ ÁP DỤNG TRONG MAIN / CHAT-WINDOW, KHÔNG ĐỤNG SIDEBAR) */
-body.omnigem-wide-chat-active chat-window conversation-container,
-body.omnigem-wide-chat-active chat-window .conversation-container,
-body.omnigem-wide-chat-active main conversation-container,
-body.omnigem-wide-chat-active main .conversation-container,
-body.omnigem-wide-chat-active chat-window infinite-scroller,
-body.omnigem-wide-chat-active main infinite-scroller {
+/* 2. Khung cuộn hội thoại chính: Mở rộng 100% */
+body.omnigem-wide-chat-active conversation-container,
+body.omnigem-wide-chat-active .conversation-container,
+body.omnigem-wide-chat-active infinite-scroller {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
   padding-left: 36px !important;
   padding-right: 36px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 /* 3. PHẦN KẾT QUẢ TRẢ VỀ CỦA AI (Scoped strictly under model-response / message-content) */
@@ -138,17 +137,6 @@ body.omnigem-wide-chat-active .ql-editor {
 body.omnigem-wide-chat-active .omnigem-input-toolbar {
   max-width: 100% !important;
   box-sizing: border-box !important;
-}
-
-/* 8. BẢO VỆ TUYỆT ĐỐI THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI:
-      Không bao giờ cho phép bất kỳ class wide-chat nào can thiệp vào sidebar */
-bard-sidenav,
-side-nav,
-[role="navigation"],
-.side-nav,
-.bard-sidenav {
-  box-sizing: border-box !important;
-  max-width: none !important;
 }
 
 /* --------------------------------------------------------------------------

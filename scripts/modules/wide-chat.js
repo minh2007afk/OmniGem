@@ -4,7 +4,7 @@
  * - Đoạn văn, tiêu đề, bảng biểu, code
  * - Danh sách số (1, 2, 3), các bước quy trình (①, ②, ③)
  * - Khung chat ở dưới đáy
- * TUYỆT ĐỐI BẢO VỆ THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
+ * TUYỆT ĐỐI KHÔNG CHẠM VÀO THANH LỊCH SỬ CHAT (SIDEBAR) BÊN TRÁI.
  */
 (() => {
   'use strict';
@@ -16,8 +16,8 @@
     modifiedElements: new Set(),
 
     async init() {
-      // 1. Load saved state from chrome.storage.local
-      this.isWide = await OmniGemStorage.get('wideChatEnabled', false);
+      // 1. Load saved state from chrome.storage.local (mặc định BẬT để tiện dụng)
+      this.isWide = await OmniGemStorage.get('wideChatEnabled', true);
 
       // 2. Apply layout class immediately
       this.applyLayout(this.isWide);
@@ -75,13 +75,12 @@
     enforceWideStyles() {
       if (!this.isWide) return;
 
-      // CHỈ truy vấn các phần tử trong chat-window hoặc main, loại trừ hoàn toàn sidebar
       const elements = document.querySelectorAll(
-        'chat-window conversation-container, main conversation-container, infinite-scroller, ms-chat-turn, response-container, model-response, message-content, .presented-response, markdown, model-response ol, model-response ul, model-response li, markdown ol, markdown ul, markdown li, model-response [class*="stepper"], model-response [class*="timeline"], model-response [class*="structured-list"], model-response [class*="step-content"], model-response [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
+        'conversation-container, .conversation-container, infinite-scroller, ms-chat-turn, response-container, model-response, message-content, .presented-response, markdown, model-response ol, model-response ul, model-response li, markdown ol, markdown ul, markdown li, model-response [class*="stepper"], model-response [class*="timeline"], model-response [class*="structured-list"], model-response [class*="step-content"], model-response [class*="step-body"], .bottom-container, input-area, .input-area-container, rich-textarea, [class*="text-input-field"], [class*="input-box"]'
       );
 
       elements.forEach(el => {
-        // BẢO VỆ TUYỆT ĐỐI: Bỏ qua nếu phần tử nằm trong sidebar lịch sử chat
+        // BẢO VỆ TUYỆT ĐỐI: Không bao giờ chạm vào thanh lịch sử chat bên trái
         if (el.closest('bard-sidenav, side-nav, [role="navigation"], .side-nav, .bard-sidenav')) {
           return;
         }
