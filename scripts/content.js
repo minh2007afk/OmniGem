@@ -88,6 +88,11 @@
         await window.OmniGemUsage.init();
       }
 
+      // 10.5. Initialize Optimize Prompt button (injected after toolbar is ready)
+      if (window.OmniGemOptimize) {
+        window.OmniGemOptimize.init();
+      }
+
       // 11. SPA Route Change Listener
       if (window.OmniGemDOM) {
         window.OmniGemDOM.onRouteChange(() => {

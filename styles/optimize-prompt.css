@@ -1,0 +1,113 @@
+/**
+ * OmniGem Optimize Prompt - Styles
+ * Button in input toolbar to AI-enhance the user's prompt before sending.
+ */
+
+/* ── Optimize button (default state) ─────────────────────────── */
+.omnigem-optimize-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid rgba(138, 180, 248, 0.35);
+  border-radius: 20px;
+  background: transparent;
+  color: #8ab4f8;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.omnigem-optimize-btn:hover:not(:disabled) {
+  background: rgba(138, 180, 248, 0.12);
+  border-color: rgba(138, 180, 248, 0.6);
+}
+
+.omnigem-optimize-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.omnigem-optimize-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Loading state ─────────────────────────────────────────────── */
+.omnigem-optimize-btn.is-loading {
+  color: rgba(138, 180, 248, 0.7);
+  cursor: wait;
+}
+
+.omnigem-optimize-btn.is-loading .omnigem-optimize-label {
+  display: none;
+}
+
+.omnigem-optimize-btn.is-loading::after {
+  content: 'Đang tối ưu...';
+  font-size: 12px;
+  animation: omnigem-opt-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes omnigem-opt-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Accept / Reject buttons (after optimize) ──────────────────── */
+.omnigem-optimize-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.omnigem-opt-reject-btn,
+.omnigem-opt-accept-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+/* × reject */
+.omnigem-opt-reject-btn {
+  border-color: rgba(242, 139, 130, 0.45);
+  color: #f28b82;
+}
+.omnigem-opt-reject-btn:hover {
+  background: rgba(242, 139, 130, 0.12);
+  border-color: rgba(242, 139, 130, 0.7);
+}
+.omnigem-opt-reject-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* ✓ accept */
+.omnigem-opt-accept-btn {
+  border-color: rgba(129, 201, 149, 0.45);
+  color: #81c995;
+}
+.omnigem-opt-accept-btn:hover {
+  background: rgba(129, 201, 149, 0.12);
+  border-color: rgba(129, 201, 149, 0.7);
+}
+.omnigem-opt-accept-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}

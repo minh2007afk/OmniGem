@@ -47,7 +47,8 @@
         "styles/prompt-library.css",
         "styles/prompt-chains.css",
         "styles/scroll-buttons.css",
-        "styles/usage-counter.css"
+        "styles/usage-counter.css",
+        "styles/optimize-prompt.css"
       ],
       "js": [
         "scripts/utils/storage.js",
@@ -59,6 +60,7 @@
         "scripts/modules/prompt-chains.js",
         "scripts/modules/scroll-buttons.js",
         "scripts/modules/usage-counter.js",
+        "scripts/modules/optimize-prompt.js",
         "scripts/content.js"
       ],
       "run_at": "document_idle"
