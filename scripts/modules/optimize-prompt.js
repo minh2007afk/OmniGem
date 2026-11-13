@@ -139,7 +139,7 @@
       }
     },
 
-    // ── Call Gemini API silently ─────────────────────────────────────
+    // ── Call Gemini API silently with auto-retry & fallback ─────────
     async _callGeminiAPI(apiKey, originalPrompt) {
       var metaPrompt =
         'Rewrite the following prompt to be clearer, more specific, and more effective. ' +
@@ -147,51 +147,73 @@
         'Respond in the same language as the original prompt.\n\n' +
         'Original prompt:\n' + originalPrompt;
 
-      console.log('[OmniGem Optimize] Sending to:', API_URL);
+      // Models to try: primary model, then flash-latest fallback
+      var models = ['gemini-3.8-flash', 'gemini-flash-latest'];
+      var lastErr = null;
 
-      var url = API_URL;
-      var headers = {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
-      };
-      // Legacy AIza keys accept ?key=, but newer AQ. auth keys trigger ACCESS_TOKEN_TYPE_UNSUPPORTED if put in query param
-      if (apiKey.startsWith('AIza')) {
-        url += '?key=' + apiKey;
-      }
+      for (var m = 0; m < models.length; m++) {
+        var model = models[m];
+        var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+        var url = endpoint;
+        if (apiKey.startsWith('AIza')) {
+          url += '?key=' + apiKey;
+        }
 
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: metaPrompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-            candidateCount: 1
+        console.log('[OmniGem Optimize] Calling model:', model);
+
+        for (var attempt = 1; attempt <= 2; attempt++) {
+          try {
+            var res = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey
+              },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: metaPrompt }] }],
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 2048,
+                  candidateCount: 1
+                }
+              })
+            });
+
+            console.log('[OmniGem Optimize] Model:', model, 'Response status:', res.status);
+
+            if (res.status === 503 && attempt === 1) {
+              console.warn('[OmniGem Optimize] 503 Service Unavailable, retrying in 1.5s...');
+              await new Promise(function(resolve) { setTimeout(resolve, 1500); });
+              continue;
+            }
+
+            if (!res.ok) {
+              var errBody = await res.text();
+              console.error('[OmniGem Optimize] API error body:', errBody.slice(0, 300));
+              throw new Error('HTTP ' + res.status + ': ' + errBody.slice(0, 150));
+            }
+
+            var data = await res.json();
+            var text = '';
+            if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+              text = data.candidates[0].content.parts[0].text;
+            }
+            if (text && text.trim()) {
+              console.log('[OmniGem Optimize] Success with model:', model);
+              return text.trim();
+            }
+            throw new Error('Empty response from model ' + model);
+          } catch (e) {
+            lastErr = e;
+            console.warn('[OmniGem Optimize] Error on ' + model + ' (attempt ' + attempt + '):', e.message);
+            if (attempt === 1 && e.message.includes('503')) {
+              await new Promise(function(resolve) { setTimeout(resolve, 1500); });
+            }
           }
-        })
-      });
-
-      console.log('[OmniGem Optimize] Response status:', res.status);
-
-      if (!res.ok) {
-        var errBody = await res.text();
-        console.error('[OmniGem Optimize] API error body:', errBody.slice(0, 300));
-        throw new Error('HTTP ' + res.status + ': ' + errBody.slice(0, 200));
+        }
       }
 
-      var data = await res.json();
-      console.log('[OmniGem Optimize] API response received');
-
-      var text = '';
-      try {
-        text = data.candidates[0].content.parts[0].text;
-      } catch (e) {
-        console.error('[OmniGem Optimize] Cannot parse response:', JSON.stringify(data).slice(0, 300));
-        throw new Error('Cannot parse API response');
-      }
-      if (!text) throw new Error('Empty response from Gemini API');
-      return text.trim();
+      throw lastErr || new Error('Không thể kết nối đến máy chủ Gemini API (503)');
     },
 
     // ── API key prompt (inline, all inline styles) ───────────────────
