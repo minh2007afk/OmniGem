@@ -2,7 +2,6 @@
    OmniGem - Wide Chat Layout Styles
    Overrides Gemini's narrow column layout to expand across the entire screen
    Eliminates all compounding nested margins, auto-centering, and excess gaps
-   Preserves internal flex/grid layouts (steppers, timelines, tables, cards)
    ========================================================================== */
 
 /* Wide Mode CSS Variables Override */
@@ -18,7 +17,9 @@ body.omnigem-wide-chat-active {
   --chat-container-width: 100% !important;
 }
 
-/* 1. Outer layout wrappers: 100% flush width for chat containers (EXCLUDING top headers) */
+/* 1. Outer layout wrappers: 100% flush width, zero compounding margins/paddings
+      NOTE: Intentionally scoped to chat-specific containers only, NOT main/chat-app
+      to prevent breaking Gemini's overall app shell and sidebar layout */
 body.omnigem-wide-chat-active conversation-container,
 body.omnigem-wide-chat-active .conversation-container,
 body.omnigem-wide-chat-active infinite-scroller,
@@ -39,7 +40,7 @@ body.omnigem-wide-chat-active .chat-history > div {
   transition: max-width 0.2s ease, width 0.2s ease;
 }
 
-/* 2. Message turns: Expand across the whole area with clean edge spacing (72px on right to prevent colliding with top header buttons) */
+/* 2. Message turns: Expand across the whole area with clean 24px edge spacing */
 body.omnigem-wide-chat-active user-query,
 body.omnigem-wide-chat-active model-response,
 body.omnigem-wide-chat-active ms-chat-turn,
@@ -50,13 +51,13 @@ body.omnigem-wide-chat-active .chat-turn {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: 32px !important;
-  padding-right: 72px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
 
-/* 3. Bottom input area: Matches the message padding for seamless alignment */
+/* 3. Bottom input area: Matches the 24px message padding for seamless alignment */
 body.omnigem-wide-chat-active .bottom-container,
 body.omnigem-wide-chat-active [class*="bottom-container"],
 body.omnigem-wide-chat-active .input-area-container,
@@ -65,8 +66,8 @@ body.omnigem-wide-chat-active [class*="input-area"] {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: 32px !important;
-  padding-right: 72px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
@@ -78,37 +79,60 @@ body.omnigem-wide-chat-active .bottom-container > div {
   width: 100% !important;
 }
 
-/* 4. Target the inner response containers WITHOUT destroying child flex/grid layouts */
+/* 4. Target the inner response text, presented response, markdown and paragraphs */
+body.omnigem-wide-chat-active model-response *,
+body.omnigem-wide-chat-active .model-response *,
+body.omnigem-wide-chat-active response-container *,
+body.omnigem-wide-chat-active .response-container *,
+body.omnigem-wide-chat-active ms-chat-turn *,
+body.omnigem-wide-chat-active .chat-turn *,
 body.omnigem-wide-chat-active message-content,
+body.omnigem-wide-chat-active message-content *,
 body.omnigem-wide-chat-active .message-content,
+body.omnigem-wide-chat-active .message-content *,
 body.omnigem-wide-chat-active markdown,
+body.omnigem-wide-chat-active markdown *,
 body.omnigem-wide-chat-active .markdown,
+body.omnigem-wide-chat-active .markdown *,
 body.omnigem-wide-chat-active .presented-response,
+body.omnigem-wide-chat-active .presented-response *,
 body.omnigem-wide-chat-active .model-response-text,
+body.omnigem-wide-chat-active .model-response-text *,
 body.omnigem-wide-chat-active .response-container-content,
+body.omnigem-wide-chat-active .response-container-content *,
 body.omnigem-wide-chat-active [class*="presented-response"],
+body.omnigem-wide-chat-active [class*="presented-response"] *,
 body.omnigem-wide-chat-active [class*="response-content"],
+body.omnigem-wide-chat-active [class*="response-content"] *,
 body.omnigem-wide-chat-active [class*="model-response-text"],
+body.omnigem-wide-chat-active [class*="model-response-text"] *,
 body.omnigem-wide-chat-active [class*="markdown"],
-body.omnigem-wide-chat-active [class*="text-container"] {
+body.omnigem-wide-chat-active [class*="markdown"] *,
+body.omnigem-wide-chat-active [class*="text-container"],
+body.omnigem-wide-chat-active [class*="text-container"] * {
   max-width: 100% !important;
-  width: 100% !important;
 }
 
-/* Ensure standard text paragraphs, headings and lists inside model responses stretch across full width
-   DO NOT apply width: 100% on generic divs inside markdown as that breaks timelines, steppers, and flex rows! */
+/* Ensure paragraph, text blocks, headings and lists inside model responses stretch across full width */
 body.omnigem-wide-chat-active model-response p,
-body.omnigem-wide-chat-active .model-response p,
-body.omnigem-wide-chat-active message-content p,
-body.omnigem-wide-chat-active .message-content p,
-body.omnigem-wide-chat-active markdown p,
-body.omnigem-wide-chat-active .markdown p,
 body.omnigem-wide-chat-active model-response ul,
 body.omnigem-wide-chat-active model-response ol,
 body.omnigem-wide-chat-active model-response li,
 body.omnigem-wide-chat-active model-response blockquote,
-body.omnigem-wide-chat-active .response-container p {
+body.omnigem-wide-chat-active .model-response p,
+body.omnigem-wide-chat-active .model-response ul,
+body.omnigem-wide-chat-active .model-response ol,
+body.omnigem-wide-chat-active .response-container p,
+body.omnigem-wide-chat-active .response-container ul,
+body.omnigem-wide-chat-active .response-container ol,
+body.omnigem-wide-chat-active message-content p,
+body.omnigem-wide-chat-active message-content div,
+body.omnigem-wide-chat-active .message-content p,
+body.omnigem-wide-chat-active .message-content div,
+body.omnigem-wide-chat-active markdown p,
+body.omnigem-wide-chat-active markdown div {
   max-width: 100% !important;
+  width: 100% !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
@@ -141,6 +165,7 @@ body.omnigem-wide-chat-active table {
   cursor: pointer;
   border: 1px solid rgba(128, 128, 128, 0.2);
   transition: all 0.15s ease;
+  /* Must sit above wide chat containers but not break header layout */
   z-index: 999;
 }
 

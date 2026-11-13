@@ -146,7 +146,7 @@
         }
       }
 
-      // C. Ensure message turns have balanced padding and 100% width (72px on right to prevent colliding with top header buttons)
+      // C. Ensure message turns have balanced 24px padding and 100% width
       const messageTurns = document.querySelectorAll(`
         model-response,
         .model-response,
@@ -161,14 +161,14 @@
         turn.style.setProperty('max-width', '100%', 'important');
         turn.style.setProperty('width', '100%', 'important');
         turn.style.setProperty('box-sizing', 'border-box', 'important');
-        turn.style.setProperty('padding-left', '32px', 'important');
-        turn.style.setProperty('padding-right', '72px', 'important');
+        turn.style.setProperty('padding-left', '24px', 'important');
+        turn.style.setProperty('padding-right', '24px', 'important');
         turn.style.setProperty('margin-left', '0px', 'important');
         turn.style.setProperty('margin-right', '0px', 'important');
         this.modifiedElements.add(turn);
       });
 
-      // D. Unclamp inner response text blocks (never force width: 100% as that breaks flex/grid items)
+      // D. Unclamp inner response text blocks
       const textBlocks = document.querySelectorAll(`
         model-response p,
         .model-response p,
@@ -180,6 +180,7 @@
 
       textBlocks.forEach((p) => {
         p.style.setProperty('max-width', '100%', 'important');
+        p.style.setProperty('width', '100%', 'important');
         p.style.setProperty('margin-left', '0px', 'important');
         p.style.setProperty('margin-right', '0px', 'important');
         this.modifiedElements.add(p);
