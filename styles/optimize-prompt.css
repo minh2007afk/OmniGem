@@ -107,14 +107,9 @@
   flex-shrink: 0;
 }
 
-/* ── Word / char count ────────────────────────────────────────── */
+/* ── Word / char count (Hidden as requested) ─────────────────── */
 .omnigem-word-count {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  white-space: nowrap;
-  user-select: none;
-  pointer-events: none;
-  font-variant-numeric: tabular-nums;
+  display: none !important;
 }
 
 /* ── Optimize button (default state) ─────────────────────────── */

@@ -22,7 +22,7 @@
     _optimizedPrompt: '',
     _state: 'idle',
 
-    // ── Inject Optimize button + live word count ─────────────────────
+    // ── Inject Optimize button ──────────────────────────────────────
     injectButton() {
       var toolbar = document.getElementById('omnigem-input-toolbar');
       if (!toolbar) return;
@@ -38,8 +38,7 @@
         'title="Tối ưu prompt bằng Gemini API (ẩn, không lưu lịch sử)">' +
         '<svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>' +
         '<span class="omnigem-optimize-label">Optimize</span>' +
-        '</button>' +
-        '<span class="omnigem-word-count" id="omnigem-word-count"></span>';
+        '</button>';
 
       var self = this;
       wrapper.querySelector('#omnigem-optimize-btn')
@@ -48,22 +47,6 @@
           self.runOptimize();
         });
       left.prepend(wrapper);
-      this._startWordCountPoller();
-    },
-
-    _startWordCountPoller() {
-      var self = this;
-      setInterval(function() {
-        if (self._state !== 'idle') return;
-        var countEl = document.getElementById('omnigem-word-count');
-        if (!countEl) return;
-        var input = OmniGemDOM.getChatInput();
-        if (!input) return;
-        var text = (input.innerText || input.textContent || '').trim();
-        countEl.textContent = text
-          ? text.split(/\s+/).length + ' words / ' + text.length + ' characters'
-          : '';
-      }, 500);
     },
 
     // ── Get API key (storage only — no fallback) ────────────────────
@@ -106,6 +89,7 @@
       this._originalPrompt = original;
       this._state = 'loading';
       this._setLoadingUI(true);
+      var startTime = Date.now();
 
       try {
         var apiKey = await this._getApiKey();
@@ -121,10 +105,16 @@
         var optimized = await this._callGeminiAPI(apiKey, original);
         console.log('[OmniGem Optimize] Got optimized text, length:', optimized.length);
 
+        // Natural delay of ~2.5s (between 2 and 3 seconds) for a realistic, thoughtful feel
+        var elapsed = Date.now() - startTime;
+        var minDelay = 2500;
+        if (elapsed < minDelay) {
+          await new Promise(function(resolve) { setTimeout(resolve, minDelay - elapsed); });
+        }
+
         this._optimizedPrompt = optimized;
 
         OmniGemDOM.simulateInput(input, optimized, true);
-        this._updateWordCount(optimized);
 
         this._state = 'review';
         this._setReviewUI();
@@ -332,12 +322,10 @@
         '<button class="omnigem-opt-accept-btn" id="omnigem-opt-accept" title="Giữ prompt đã tối ưu">' +
         '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' +
         '</button>' +
-        '</div>' +
-        '<span class="omnigem-word-count" id="omnigem-word-count"></span>';
+        '</div>';
       var self = this;
       wrapper.querySelector('#omnigem-opt-reject').addEventListener('click', function() { self.reject(); });
       wrapper.querySelector('#omnigem-opt-accept').addEventListener('click', function() { self.accept(); });
-      this._updateWordCount(this._optimizedPrompt);
     },
 
     _restoreOptimizeButton: function() {
@@ -348,8 +336,7 @@
         'title="Tối ưu prompt bằng Gemini API (ẩn, không lưu lịch sử)">' +
         '<svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>' +
         '<span class="omnigem-optimize-label">Optimize</span>' +
-        '</button>' +
-        '<span class="omnigem-word-count" id="omnigem-word-count"></span>';
+        '</button>';
       var self = this;
       wrapper.querySelector('#omnigem-optimize-btn')
         .addEventListener('click', function() { self.runOptimize(); });
@@ -383,20 +370,12 @@
       }, 3500);
     },
 
-    _updateWordCount: function(text) {
-      var countEl = document.getElementById('omnigem-word-count');
-      if (!countEl || !text) return;
-      var words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      countEl.textContent = words + ' words / ' + text.length + ' characters';
-    },
-
     accept: function() { this._restoreOptimizeButton(); },
 
     reject: function() {
       var input = OmniGemDOM.getChatInput();
       if (input) {
         OmniGemDOM.simulateInput(input, this._originalPrompt, true);
-        this._updateWordCount(this._originalPrompt);
       }
       this._restoreOptimizeButton();
     },
