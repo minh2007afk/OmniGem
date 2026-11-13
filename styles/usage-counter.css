@@ -23,12 +23,6 @@
   gap: 12px;
 }
 
-.omnigem-counter-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .omnigem-helper-hint {
   color: var(--omnigem-text-muted, #70757a);
   font-size: 11px;

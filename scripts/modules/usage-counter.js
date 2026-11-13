@@ -89,10 +89,7 @@
         }
       }, 1500);
 
-      // 8. Live Word & Character Counter
-      this.setupLiveWordCounter();
-
-      // 9. Auto-refresh every 2 minutes
+      // 8. Auto-refresh every 2 minutes
       setInterval(() => {
         if (!window.location.pathname.includes('/usage')) {
           this.fetchLiveQuota();
@@ -381,9 +378,6 @@
       toolbar.className = 'omnigem-input-toolbar';
       toolbar.innerHTML = `
         <div class="omnigem-input-toolbar-left">
-          <span class="omnigem-counter-badge" id="omnigem-word-counter">
-            0 words / 0 characters
-          </span>
           <span class="omnigem-helper-hint">
             use <code>//</code> for prompts and <code>,,</code> for chains
           </span>
@@ -409,30 +403,13 @@
       }
     },
 
-    setupLiveWordCounter() {
-      const updateCounts = () => {
-        const input = OmniGemDOM.getChatInput();
-        const text = input ? (input.innerText || input.textContent || '').trim() : '';
-        const chars = text.length;
-        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
-
-        const counterEl = document.getElementById('omnigem-word-counter');
-        if (counterEl) {
-          counterEl.textContent = `${words} words / ${chars} characters`;
-        }
-      };
-
-      document.addEventListener('input', updateCounts, true);
-      document.addEventListener('keyup', updateCounts, true);
-    },
-
     setupMessageCompletionListener() {
       let isWaitingForReply = false;
 
       document.addEventListener('click', (e) => {
         const sendBtn = e.target.closest('button[aria-label*="Send"], button[aria-label*="Gửi"], .send-button');
         if (sendBtn) isWaitingForReply = true;
-      }, true);
+      }, false);
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -441,7 +418,7 @@
             isWaitingForReply = true;
           }
         }
-      }, true);
+      }, false);
 
       // Re-fetch live quota after model completes response
       setInterval(() => {

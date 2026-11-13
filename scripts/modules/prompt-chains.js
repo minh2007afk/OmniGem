@@ -30,23 +30,35 @@
     },
 
     /**
-     * Listen for ",," trigger inside Gemini's chat input
+     * Listen for ",," trigger inside Gemini's chat input with zero typing delay.
+     * Skips during IME composition (Vietnamese typing) and avoids forced layout reflows.
      */
     setupInlineTrigger() {
-      document.addEventListener('input', (e) => {
-        const input = OmniGemDOM.getChatInput();
-        if (!input) return;
+      let debounceTimer = null;
 
-        const text = input.innerText || input.textContent || '';
-        // Check if text ends with ",,"
-        const match = text.match(/,,([a-zA-Z0-9_\s]*)$/);
-        if (match) {
-          const filter = match[1].toLowerCase().trim();
-          this.showAutocomplete(input, filter);
-        } else {
-          if (this.autocompleteEl) this.closeAutocomplete();
-        }
-      }, true);
+      document.addEventListener('input', (e) => {
+        // Fast path: skip if IME composition is in progress
+        if (e.isComposing) return;
+
+        const target = e.target;
+        if (!target || (!target.isContentEditable && target.tagName !== 'TEXTAREA')) return;
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const input = OmniGemDOM.getChatInput();
+          if (!input) return;
+
+          // Use textContent to avoid expensive layout thrashing
+          const text = input.textContent || '';
+          const match = text.match(/,,([a-zA-Z0-9_\s]*)$/);
+          if (match) {
+            const filter = match[1].toLowerCase().trim();
+            this.showAutocomplete(input, filter);
+          } else {
+            if (this.autocompleteEl) this.closeAutocomplete();
+          }
+        }, 35);
+      }, false);
 
       // Keyboard navigation
       document.addEventListener('keydown', (e) => {

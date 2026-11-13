@@ -15,7 +15,6 @@ OmniGem enriches the Gemini web experience with wide-chat layouts, live quota tr
 - **⛓️ Automated Prompt Chains**: Run multi-step automated sequences triggered inline with `,,`, with progress tracking and automatic waiting for model generation.
 - **⏱️ Response Timestamps**: Displays accurate generation timestamps next to every model message.
 - **↕️ Smart Scroll Controls**: Dedicated chat-only scroll-to-top, scroll-to-bottom, and double-click Auto-Scroll that follows live generation.
-- **📝 Input Statistics**: Live word and character counting integrated directly above the Gemini prompt field.
 
 ---
 
