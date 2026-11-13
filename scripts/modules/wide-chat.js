@@ -71,13 +71,15 @@
     enforceWideStyles() {
       if (!this.isWide) return;
 
-      // A. Unclamp ancestor hierarchy from model responses upwards (set to 100% flush width)
+      // A. Walk UP from model-response to unclamp ancestor scroll/layout containers.
+      //    Only strip padding/margin from SCROLL WRAPPERS (overflow:auto/scroll),
+      //    never from flex/grid containers that hold inline layout primitives.
       const sampleResponse = document.querySelector('model-response, .model-response, response-container');
       if (sampleResponse) {
         let el = sampleResponse.parentElement;
         while (el && el !== document.body && el !== document.documentElement) {
-          // Do not touch sidebars or top headers
           const tag = el.tagName.toLowerCase();
+          // Stop at sidebars, headers, or the root app shell
           if (
             tag.includes('side') ||
             el.classList.contains('side-nav') ||
@@ -94,35 +96,20 @@
           }
 
           const cs = window.getComputedStyle(el);
-          const pLeft = parseFloat(cs.paddingLeft) || 0;
-          const pRight = parseFloat(cs.paddingRight) || 0;
 
-          // Zero out large paddings and auto margins on wrappers to stop compounding shrink
-          if (pLeft > 24) {
-            el.style.setProperty('padding-left', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-          if (pRight > 24) {
-            el.style.setProperty('padding-right', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-
-          if (cs.marginLeft === 'auto' || parseFloat(cs.marginLeft) > 30) {
-            el.style.setProperty('margin-left', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-          if (cs.marginRight === 'auto' || parseFloat(cs.marginRight) > 30) {
-            el.style.setProperty('margin-right', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-
-          // Force wrappers to 100% width
+          // Only unclamp max-width on elements that actually constrain width
           if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
             el.style.setProperty('max-width', '100%', 'important');
             this.modifiedElements.add(el);
           }
-          if (cs.width && cs.width !== '100%') {
-            el.style.setProperty('width', '100%', 'important');
+
+          // Only strip auto-centering margins (not padding — padding defines inner spacing)
+          if (cs.marginLeft === 'auto') {
+            el.style.setProperty('margin-left', '0px', 'important');
+            this.modifiedElements.add(el);
+          }
+          if (cs.marginRight === 'auto') {
+            el.style.setProperty('margin-right', '0px', 'important');
             this.modifiedElements.add(el);
           }
 
@@ -130,8 +117,8 @@
         }
       }
 
-      // B. Unclamp bottom input bar hierarchy
-      const bottomArea = document.querySelector('.bottom-container, [class*="bottom-container"], input-area, rich-textarea');
+      // B. Unclamp bottom input bar hierarchy (max-width only)
+      const bottomArea = document.querySelector('.bottom-container, input-area, rich-textarea');
       if (bottomArea) {
         let bEl = bottomArea;
         while (bEl && bEl !== document.body) {
@@ -139,25 +126,14 @@
           const bcs = window.getComputedStyle(bEl);
           if (bcs.maxWidth && bcs.maxWidth !== 'none' && !bcs.maxWidth.includes('100%')) {
             bEl.style.setProperty('max-width', '100%', 'important');
-            bEl.style.setProperty('width', '100%', 'important');
             this.modifiedElements.add(bEl);
           }
           bEl = bEl.parentElement;
         }
       }
 
-      // C. Ensure message turns have balanced 24px padding and 100% width
-      const messageTurns = document.querySelectorAll(`
-        model-response,
-        .model-response,
-        user-query,
-        .user-query-container,
-        response-container,
-        .response-container,
-        ms-chat-turn
-      `);
-
-      messageTurns.forEach((turn) => {
+      // C. Ensure per-turn message wrappers have 24px padding and 100% width
+      document.querySelectorAll('model-response, user-query, .user-query-container, response-container, ms-chat-turn').forEach(turn => {
         turn.style.setProperty('max-width', '100%', 'important');
         turn.style.setProperty('width', '100%', 'important');
         turn.style.setProperty('box-sizing', 'border-box', 'important');
@@ -168,22 +144,12 @@
         this.modifiedElements.add(turn);
       });
 
-      // D. Unclamp inner response text blocks
-      const textBlocks = document.querySelectorAll(`
-        model-response p,
-        .model-response p,
-        message-content p,
-        .message-content p,
-        markdown p,
-        .markdown p
-      `);
-
-      textBlocks.forEach((p) => {
-        p.style.setProperty('max-width', '100%', 'important');
-        p.style.setProperty('width', '100%', 'important');
-        p.style.setProperty('margin-left', '0px', 'important');
-        p.style.setProperty('margin-right', '0px', 'important');
-        this.modifiedElements.add(p);
+      // D. Unclamp ONLY named text-block elements — never div or * (would break flex children)
+      document.querySelectorAll('message-content, .presented-response, markdown, .markdown').forEach(el => {
+        el.style.setProperty('max-width', '100%', 'important');
+        el.style.setProperty('width', '100%', 'important');
+        el.style.setProperty('box-sizing', 'border-box', 'important');
+        this.modifiedElements.add(el);
       });
     },
 
