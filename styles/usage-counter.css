@@ -1,0 +1,257 @@
+/* ==========================================================================
+   OmniGem - Usage Counter & Input Toolbar Styles
+   ========================================================================== */
+
+/* Integrated Toolbar Bar placed right above Gemini's input bar */
+.omnigem-input-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  margin-bottom: 4px;
+  font-family: 'Google Sans Text', Roboto, sans-serif;
+  font-size: 11.5px;
+  color: var(--omnigem-text-muted, #9aa0a6);
+  user-select: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.omnigem-input-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.omnigem-counter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.omnigem-helper-hint {
+  color: var(--omnigem-text-muted, #70757a);
+  font-size: 11px;
+}
+
+.omnigem-helper-hint code {
+  color: #8ab4f8;
+  background: rgba(138, 180, 248, 0.12);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.omnigem-input-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Usage Counter Pill */
+.omnigem-usage-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--omnigem-border, rgba(255, 255, 255, 0.14));
+  border-radius: var(--omnigem-radius-pill, 9999px);
+  color: var(--omnigem-text, #e3e3e3);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.omnigem-usage-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #8ab4f8;
+  border-color: rgba(138, 180, 248, 0.4);
+}
+
+.omnigem-usage-pill.is-warning {
+  border-color: #fbbc05;
+  color: #fbbc05;
+}
+
+.omnigem-usage-pill.is-limit {
+  border-color: #f28b82;
+  color: #f28b82;
+  background: rgba(242, 139, 130, 0.14);
+}
+
+.omnigem-usage-pill svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   Expanded Usage Breakdown Panel (Floating Card)
+   Attached directly to document.body so it NEVER gets squished or clipped
+   -------------------------------------------------------------------------- */
+.omnigem-usage-panel {
+  position: fixed !important;
+  bottom: 84px !important;
+  right: 28px !important;
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: 90vw !important;
+  box-sizing: border-box !important;
+  background: var(--omnigem-surface, #1e1f20) !important;
+  border: 1px solid var(--omnigem-border, #3c4043) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65) !important;
+  z-index: 1000000 !important;
+  font-family: 'Google Sans Text', Roboto, sans-serif !important;
+  color: var(--omnigem-text, #e3e3e3) !important;
+  padding: 16px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  animation: omnigemSlideUp 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.omnigem-usage-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--omnigem-border, #3c4043);
+  padding-bottom: 10px;
+}
+
+.omnigem-usage-panel-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.omnigem-usage-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.omnigem-usage-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.omnigem-usage-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+
+.omnigem-usage-label {
+  font-weight: 500;
+  color: var(--omnigem-text, #e3e3e3);
+}
+
+.omnigem-usage-val {
+  font-weight: 600;
+  color: #8ab4f8;
+}
+
+.omnigem-usage-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.omnigem-usage-bar-fill {
+  height: 100%;
+  background: #1a73e8;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.omnigem-usage-bar-fill.warning {
+  background: #fbbc05;
+}
+
+.omnigem-usage-bar-fill.danger {
+  background: #f28b82;
+}
+
+.omnigem-usage-reset-time {
+  font-size: 11.5px;
+  color: var(--omnigem-text-muted, #9aa0a6);
+}
+
+.omnigem-usage-reset-time strong {
+  color: var(--omnigem-text, #e3e3e3);
+}
+
+/* Display option toggles */
+.omnigem-usage-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--omnigem-border, #3c4043);
+  padding-top: 10px;
+  font-size: 11.5px;
+}
+
+.omnigem-pill-toggle-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.omnigem-pill-toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--omnigem-text-muted, #9aa0a6);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.omnigem-pill-toggle-btn.is-active {
+  background: #1a73e8;
+  color: #fff;
+  font-weight: 500;
+}
+
+.omnigem-usage-footer {
+  font-size: 10.5px;
+  color: var(--omnigem-text-muted, #70757a);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 1.3;
+}
+
+.omnigem-footer-link {
+  color: #8ab4f8 !important;
+  text-decoration: none !important;
+  transition: opacity 0.15s ease;
+}
+
+.omnigem-footer-link:hover {
+  opacity: 0.8;
+  text-decoration: underline !important;
+}
+
+.omnigem-action-icon-btn.is-refreshing svg {
+  animation: omnigemSpin 0.75s linear infinite;
+}
+
+@keyframes omnigemSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

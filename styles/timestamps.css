@@ -1,0 +1,60 @@
+/* ==========================================================================
+   OmniGem - Message Timestamps Styles
+   Injected next to or below model response blocks
+   ========================================================================== */
+
+.omnigem-timestamp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Google Sans Text', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--omnigem-text-muted, #9aa0a6);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 8px;
+  border-radius: var(--omnigem-radius-pill, 9999px);
+  user-select: none;
+  cursor: default;
+  vertical-align: middle;
+  line-height: 1.2;
+  margin-right: 8px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  animation: omnigemFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.omnigem-timestamp-badge:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: var(--omnigem-text, #ffffff);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.omnigem-timestamp-badge svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  fill: currentColor;
+  opacity: 0.9;
+}
+
+/* Placement within model response footer actions */
+.omnigem-timestamp-container {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
+}
+
+/* Subtle animation on injection */
+@keyframes omnigemFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

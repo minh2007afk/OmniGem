@@ -1,0 +1,91 @@
+/* ==========================================================================
+   OmniGem - Main & Global Styles
+   Matches Google Gemini Material 3 Design Tokens & Themes (Light & Dark)
+   ========================================================================== */
+
+:root {
+  --omnigem-primary: #1a73e8;
+  --omnigem-primary-hover: #1557b0;
+  --omnigem-surface: #ffffff;
+  --omnigem-surface-variant: #f1f3f4;
+  --omnigem-text: #1f1f1f;
+  --omnigem-text-muted: #70757a;
+  --omnigem-border: #dadce0;
+  --omnigem-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --omnigem-transition-speed: 0.2s;
+  --omnigem-radius-pill: 9999px;
+  --omnigem-radius-md: 8px;
+  --omnigem-radius-lg: 14px;
+}
+
+/* Dark Mode Adaptation for Gemini (System theme, Gemini dark-theme class, or dark background) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --omnigem-surface: #1e1f20;
+    --omnigem-surface-variant: #282a2c;
+    --omnigem-text: #e3e3e3;
+    --omnigem-text-muted: #9aa0a6;
+    --omnigem-border: #3c4043;
+    --omnigem-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+}
+
+body.dark-theme,
+body.theme-dark,
+[data-theme="dark"],
+html.dark-theme,
+html.theme-dark,
+body[style*="rgb(19, 19, 20)"],
+body[style*="#131314"] {
+  --omnigem-surface: #1e1f20 !important;
+  --omnigem-surface-variant: #282a2c !important;
+  --omnigem-text: #e3e3e3 !important;
+  --omnigem-text-muted: #9aa0a6 !important;
+  --omnigem-border: #3c4043 !important;
+  --omnigem-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Base button reset */
+.omnigem-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all var(--omnigem-transition-speed) ease;
+}
+
+/* Tooltip container */
+.omnigem-tooltip {
+  position: relative;
+}
+
+.omnigem-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: rgba(32, 33, 36, 0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.15s ease;
+  z-index: 999999;
+}
+
+.omnigem-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}

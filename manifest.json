@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "OmniGem - Superpowers for Gemini",
+  "version": "1.0.0",
+  "description": "Comprehensive client-side superpower suite for Google Gemini: Wide Chat, Timestamps, Folders Management, Prompt Library, Automated Chains, Scroll Controls & Usage Counter.",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "*://gemini.google.com/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "action": {
+    "default_title": "OmniGem - Gemini Superpowers",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://gemini.google.com/*"
+      ],
+      "all_frames": true,
+      "css": [
+        "styles/main.css",
+        "styles/wide-chat.css",
+        "styles/timestamps.css",
+        "styles/sidebar-folders.css",
+        "styles/prompt-library.css",
+        "styles/prompt-chains.css",
+        "styles/scroll-buttons.css",
+        "styles/usage-counter.css"
+      ],
+      "js": [
+        "scripts/utils/storage.js",
+        "scripts/utils/dom-observer.js",
+        "scripts/modules/wide-chat.js",
+        "scripts/modules/timestamps.js",
+        "scripts/modules/sidebar-folders.js",
+        "scripts/modules/prompt-library.js",
+        "scripts/modules/prompt-chains.js",
+        "scripts/modules/scroll-buttons.js",
+        "scripts/modules/usage-counter.js",
+        "scripts/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
