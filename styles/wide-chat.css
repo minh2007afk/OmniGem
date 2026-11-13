@@ -1,11 +1,13 @@
 /* ==========================================================================
    OmniGem - Wide Chat Layout Styles
    Overrides Gemini's narrow column layout to expand across the entire screen.
-   IMPORTANT: Only targets BLOCK-LEVEL text containers — never flex/grid children,
-   inline elements, or layout primitives — to prevent text overflowing into columns.
+   Safe container-only architecture:
+   - Sets CSS variables to 100%
+   - Unclamps outer conversation/scroll containers
+   - NEVER modifies internal message children, lists, or flex items
    ========================================================================== */
 
-/* Wide Mode CSS Variables Override */
+/* 1. Gemini native CSS variables override */
 html.omnigem-wide-chat-active,
 body.omnigem-wide-chat-active {
   --omnigem-wide-max: 100% !important;
@@ -18,38 +20,16 @@ body.omnigem-wide-chat-active {
   --chat-container-width: 100% !important;
 }
 
-/* 1. Scroll and conversation containers: unclamp width, strip excess padding/margin */
+/* 2. Uncap the main conversation and scroll containers */
 body.omnigem-wide-chat-active conversation-container,
 body.omnigem-wide-chat-active .conversation-container,
 body.omnigem-wide-chat-active infinite-scroller,
-body.omnigem-wide-chat-active .chat-history,
-body.omnigem-wide-chat-active infinite-scroller > div,
-body.omnigem-wide-chat-active conversation-container > div,
-body.omnigem-wide-chat-active .conversation-container > div,
-body.omnigem-wide-chat-active .chat-history > div {
-  max-width: 100% !important;
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* 2. Per-turn message wrappers: 24px breathing room on each side */
-body.omnigem-wide-chat-active user-query,
-body.omnigem-wide-chat-active model-response,
-body.omnigem-wide-chat-active ms-chat-turn,
-body.omnigem-wide-chat-active .user-query-container,
-body.omnigem-wide-chat-active .response-container,
-body.omnigem-wide-chat-active .chat-turn {
+body.omnigem-wide-chat-active .chat-history {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
 }
 
 /* 3. Bottom input area */
@@ -59,10 +39,8 @@ body.omnigem-wide-chat-active input-area {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
 }
 
 body.omnigem-wide-chat-active rich-textarea {
@@ -70,43 +48,7 @@ body.omnigem-wide-chat-active rich-textarea {
   width: 100% !important;
 }
 
-/* 4. Uncap ONLY the named text-block elements (NOT divs, NOT * — those break flex children) */
-body.omnigem-wide-chat-active message-content,
-body.omnigem-wide-chat-active .message-content,
-body.omnigem-wide-chat-active .presented-response,
-body.omnigem-wide-chat-active markdown,
-body.omnigem-wide-chat-active .markdown {
-  max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* 4b. Only block-level prose elements: p, headings, ul, ol, blockquote — NOT div, NOT span, NOT li sub-elements */
-body.omnigem-wide-chat-active model-response p,
-body.omnigem-wide-chat-active model-response h1,
-body.omnigem-wide-chat-active model-response h2,
-body.omnigem-wide-chat-active model-response h3,
-body.omnigem-wide-chat-active model-response h4,
-body.omnigem-wide-chat-active model-response ul,
-body.omnigem-wide-chat-active model-response ol,
-body.omnigem-wide-chat-active model-response blockquote,
-body.omnigem-wide-chat-active markdown p,
-body.omnigem-wide-chat-active markdown h1,
-body.omnigem-wide-chat-active markdown h2,
-body.omnigem-wide-chat-active markdown h3,
-body.omnigem-wide-chat-active markdown ul,
-body.omnigem-wide-chat-active markdown ol,
-body.omnigem-wide-chat-active markdown blockquote,
-body.omnigem-wide-chat-active message-content p,
-body.omnigem-wide-chat-active message-content h1,
-body.omnigem-wide-chat-active message-content h2,
-body.omnigem-wide-chat-active message-content h3,
-body.omnigem-wide-chat-active message-content ul,
-body.omnigem-wide-chat-active message-content ol {
-  max-width: 100% !important;
-}
-
-/* 5. Code blocks and tables: safe to stretch */
+/* 4. Code blocks and tables expand smoothly */
 body.omnigem-wide-chat-active code-block,
 body.omnigem-wide-chat-active .code-block,
 body.omnigem-wide-chat-active pre {

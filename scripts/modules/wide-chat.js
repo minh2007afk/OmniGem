@@ -1,7 +1,7 @@
 /**
  * OmniGem Wide Chat Module
  * Expands Gemini's chat interface from narrow centered column to full screen width.
- * Eliminates compounding nested margins and aligns text flush with 24px edge padding.
+ * Safe container-only architecture: unclamps outer scrollers without touching inner flex items.
  */
 (() => {
   'use strict';
@@ -22,7 +22,7 @@
       // 3. Inject toggle button into Gemini's top navigation bar
       this.injectToggleButton();
 
-      // 4. Repeated check to ensure button stays mounted and response width stays enforced
+      // 4. Periodically ensure button stays mounted and wide layout stays active
       this.enforceInterval = setInterval(() => {
         if (!document.getElementById(this.buttonId)) {
           this.injectToggleButton();
@@ -30,20 +30,9 @@
         if (this.isWide) {
           this.enforceWideStyles();
         }
-      }, 1000);
+      }, 1200);
 
-      // 5. Hook into MutationObserver for newly streamed responses
-      OmniGemDOM.onElementAdded(
-        'model-response, .model-response, message-content, markdown, .presented-response',
-        () => {
-          if (this.isWide) {
-            this.enforceWideStyles();
-          }
-        },
-        'data-omnigem-wide-enforced'
-      );
-
-      // 6. Listen for storage changes
+      // 5. Listen for storage changes
       OmniGemStorage.onChanged((changes) => {
         if (changes.wideChatEnabled !== undefined) {
           this.isWide = changes.wideChatEnabled.newValue;
@@ -66,106 +55,31 @@
     },
 
     /**
-     * Programmatically unclamp ancestor containers, side paddings, and inner response text
+     * Programmatically unclamp outer conversation/scroll containers only.
+     * NEVER modifies internal message elements, lists, markdown, or flex children.
      */
     enforceWideStyles() {
       if (!this.isWide) return;
 
-      // A. Walk UP from model-response to unclamp ancestor scroll/layout containers.
-      //    Only strip padding/margin from SCROLL WRAPPERS (overflow:auto/scroll),
-      //    never from flex/grid containers that hold inline layout primitives.
-      const sampleResponse = document.querySelector('model-response, .model-response, response-container');
-      if (sampleResponse) {
-        let el = sampleResponse.parentElement;
-        while (el && el !== document.body && el !== document.documentElement) {
-          const tag = el.tagName.toLowerCase();
-          // Stop at sidebars, headers, or the root app shell
-          if (
-            tag.includes('side') ||
-            el.classList.contains('side-nav') ||
-            tag === 'header' ||
-            tag === 'top-nav' ||
-            tag === 'chat-app' ||
-            tag === 'main' ||
-            el.getAttribute('role') === 'banner' ||
-            el.classList.contains('top-container') ||
-            el.classList.contains('trailing-actions') ||
-            el.classList.contains('top-nav-actions')
-          ) {
-            break;
-          }
-
-          const cs = window.getComputedStyle(el);
-
-          // Only unclamp max-width on elements that actually constrain width
-          if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
-            el.style.setProperty('max-width', '100%', 'important');
-            this.modifiedElements.add(el);
-          }
-
-          // Only strip auto-centering margins (not padding — padding defines inner spacing)
-          if (cs.marginLeft === 'auto') {
-            el.style.setProperty('margin-left', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-          if (cs.marginRight === 'auto') {
-            el.style.setProperty('margin-right', '0px', 'important');
-            this.modifiedElements.add(el);
-          }
-
-          el = el.parentElement;
+      const containers = document.querySelectorAll(
+        'conversation-container, .conversation-container, infinite-scroller, .chat-history, .bottom-container, input-area'
+      );
+      containers.forEach(el => {
+        const cs = window.getComputedStyle(el);
+        if (cs.maxWidth && cs.maxWidth !== 'none' && !cs.maxWidth.includes('100%')) {
+          el.style.setProperty('max-width', '100%', 'important');
+          this.modifiedElements.add(el);
         }
-      }
-
-      // B. Unclamp bottom input bar hierarchy (max-width only)
-      const bottomArea = document.querySelector('.bottom-container, input-area, rich-textarea');
-      if (bottomArea) {
-        let bEl = bottomArea;
-        while (bEl && bEl !== document.body) {
-          if (bEl.tagName.toLowerCase().includes('side')) break;
-          const bcs = window.getComputedStyle(bEl);
-          if (bcs.maxWidth && bcs.maxWidth !== 'none' && !bcs.maxWidth.includes('100%')) {
-            bEl.style.setProperty('max-width', '100%', 'important');
-            this.modifiedElements.add(bEl);
-          }
-          bEl = bEl.parentElement;
-        }
-      }
-
-      // C. Ensure per-turn message wrappers have 24px padding and 100% width
-      document.querySelectorAll('model-response, user-query, .user-query-container, response-container, ms-chat-turn').forEach(turn => {
-        turn.style.setProperty('max-width', '100%', 'important');
-        turn.style.setProperty('width', '100%', 'important');
-        turn.style.setProperty('box-sizing', 'border-box', 'important');
-        turn.style.setProperty('padding-left', '24px', 'important');
-        turn.style.setProperty('padding-right', '24px', 'important');
-        turn.style.setProperty('margin-left', '0px', 'important');
-        turn.style.setProperty('margin-right', '0px', 'important');
-        this.modifiedElements.add(turn);
-      });
-
-      // D. Unclamp ONLY named text-block elements — never div or * (would break flex children)
-      document.querySelectorAll('message-content, .presented-response, markdown, .markdown').forEach(el => {
-        el.style.setProperty('max-width', '100%', 'important');
-        el.style.setProperty('width', '100%', 'important');
-        el.style.setProperty('box-sizing', 'border-box', 'important');
-        this.modifiedElements.add(el);
       });
     },
 
     /**
-     * Clear all inline width & padding overrides when wide chat is disabled
+     * Clear inline width overrides when wide chat is disabled
      */
     clearWideStyles() {
       this.modifiedElements.forEach((el) => {
         if (el && el.style) {
           el.style.removeProperty('max-width');
-          el.style.removeProperty('width');
-          el.style.removeProperty('padding-left');
-          el.style.removeProperty('padding-right');
-          el.style.removeProperty('margin-left');
-          el.style.removeProperty('margin-right');
-          el.style.removeProperty('box-sizing');
         }
       });
       this.modifiedElements.clear();
